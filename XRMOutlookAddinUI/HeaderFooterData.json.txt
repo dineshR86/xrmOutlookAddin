@@ -1,0 +1,21 @@
+{
+	"headerLinks": [],
+	"footerLinks": [
+		{
+			"name": "Office Developer Home",
+			"url": "https://developer.microsoft.com/en-us/office"
+		},
+		{
+			"name": "SharePoint Framework",
+			"url": "https://github.com/SharePoint/sp-dev-docs/wiki"
+		},
+		{
+			"name": "PnP PowerShell",
+			"url": "https://github.com/SharePoint/PnP-PowerShell/blob/master/Documentation/readme.md"
+		},
+		{
+			"name": "Toolchain",
+			"url": "http://julieturner.net/2018/01/conquer-your-dev-toolchain-in-classic-sharepoint-part-1/"
+		}
+	]
+}
