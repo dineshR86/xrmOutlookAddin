@@ -1,0 +1,100 @@
+<!-- Copyright (c) Microsoft Corporation. All rights reserved. Licensed under the MIT license. -->
+<!-- See LICENSE in the project root for license information -->
+
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=Edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>XRMOUtlookAddinUIJquery</title>
+
+    <!-- Office JavaScript API -->
+    <script type="text/javascript" src="https://appsforoffice.microsoft.com/lib/1.1/hosted/office.debug.js"></script>
+
+    <!-- LOCAL -->
+    <link rel="stylesheet" href="node_modules/bootstrap/dist/css/bootstrap.min.css" />
+
+    <!-- CDN -->
+    <!-- For the Office UI Fabric, go to http://aka.ms/office-ui-fabric to learn more. -->
+    <!--<link rel="stylesheet" href="https://static2.sharepointonline.com/files/fabric/office-ui-fabric-js/1.2.0/css/fabric.min.css" />-->
+    <!--<link rel="stylesheet" href="https://static2.sharepointonline.com/files/fabric/office-ui-fabric-js/1.2.0/css/fabric.components.min.css" />-->
+
+    <!-- Template styles -->
+    <link href="app.css" rel="stylesheet" type="text/css" />
+</head>
+
+<body>
+    <div class="container col-sm">
+        <div class="form-group">
+            <label for="sitecollections">Site Collections</label>
+            <select class="form-control" id="sitecollections">
+                <option value="" selected>-select-</option>
+                <option value="sitecollection1">sitecollection1</option>
+                <option value="sitecollection2">sitecollection2</option>
+                <option value="sitecollection3">sitecollection3</option>
+                <option value="sitecollection4">sitecollection4</option>
+                <option value="sitecollection5">sitecollection5</option>
+            </select>
+            <small id="sitecollectionhelp" class="form-text text-muted">Please select a sitecollection</small>
+        </div>
+        <div class="form-group">
+            <label for="lists">Lists</label>
+            <select class="form-control" id="lists">
+                <option value="" selected>-select-</option>
+                <option value="list1">List1</option>
+                <option value="list2">List2</option>
+                <option value="list3">List3</option>
+            </select>
+            <small id="listhelp" class="form-text text-muted">Please select a List</small>
+        </div>
+        <div class="form-group" id="casefilter">
+            <label for="casestatus">Case Filter</label>
+            <select class="form-control" id="casestatus">
+                <option value="" selected>-select-</option>
+                <option value="status1">Status1</option>
+                <option value="status2">Status2</option>
+                <option value="status3">Status3</option>
+            </select>
+        </div>
+        <div class="form-group invisible" id="projectfilter" style="display:none">
+            <label for="projectstatus">Project Filter</label>
+            <select class="form-control" id="projectstatus">
+                <option value="" selected>-select-</option>
+                <option value="status1">Status1</option>
+                <option value="status1">Status1</option>
+                <option value="status1">Status1</option>
+            </select>
+        </div>
+        <div class="form-group invisible" id="contractfilter" style="display:none">
+            <label for="relatedClient">Contract Filter</label>
+            <select class="form-control" id="relatedClient">
+                <option value="" selected>-select-</option>
+                <option value="client1">Client1</option>
+                <option value="client2">Client2</option>
+                <option value="client3">Client3</option>
+            </select>
+            <select class="form-control" id="relatedStakeholder">
+                <option value="" selected>-select-</option>
+                <option value="stakeholder1">Stakeholder1</option>
+                <option value="stakeholder2">Stakeholder2</option>
+                <option value="stakeholder3">Stakeholder3</option>
+            </select>
+        </div>
+        <div class="form-check form-check-inline">
+            <input class="form-check-input" type="checkbox" id="saveemail" value="email">
+            <label class="form-check-label" for="saveemail">Email</label>
+        </div>
+        <div class="form-check form-check-inline">
+            <input class="form-check-input" type="checkbox" id="saveattachments" value="attachments">
+            <label class="form-check-label" for="saveattachments">Attachments</label>
+        </div>
+
+        <div> <button type="submit" class="btn btn-primary">Save</button></div>
+    </div>
+
+    <script type="text/javascript" src="node_modules/jquery/dist/jquery.js"></script>
+</body>
+
+</html>
