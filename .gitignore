@@ -3,3 +3,5 @@
 ################################################################################
 
 /XRMOutlookAddInAPI/XRMOutlookAddIn/obj
+/XRMOutlookAddInAPI/XRMOutlookAddIn/bin/Debug/netstandard2.0
+/XRMOutlookAddInAPI/.vs/XRMOutlookAddIn/v15
