@@ -16,6 +16,7 @@ using System.Net.Http.Headers;
 using System.Reflection;
 using System.Collections;
 using System.Collections.Generic;
+using System.Text;
 
 namespace XRMOutlookAddIn
 {
@@ -54,8 +55,29 @@ namespace XRMOutlookAddIn
 
                 HttpResponseMessage response = _sharedHttpClient.SendAsync(requestMsg).Result;
                 var content =  await response.Content.ReadAsStringAsync();
-                var x = JsonConvert.DeserializeObject<RootValue>(content);
-                return new HttpResponseMessage(HttpStatusCode.OK) { Content = new StringContent(content) };
+                dynamic items = JsonConvert.DeserializeObject<RootValue>(content);
+                ConfigData config = new ConfigData();
+                foreach (var item in items.value)
+                {
+                    switch (item.fields.ConfigKey)
+                    {
+                        case "SiteCollections":
+                            config.SiteCollectionUrls = item.fields.ConfigValue;
+                            break;
+                        case "Lists":
+                            config.Lists = item.fields.ConfigValue;
+                            break;
+                        case "CaseStatusFilter":
+                            config.CaseStatusFilter = item.fields.ConfigValue;
+                            break;
+                        case "ProjectStatusFilter":
+                            config.ProjectStatusFilter = item.fields.ConfigValue;
+                            break;
+                        default:
+                            break;
+                    }
+                }
+                return new HttpResponseMessage(HttpStatusCode.OK) { Content = new StringContent(JsonConvert.SerializeObject(config,Formatting.Indented),Encoding.UTF8,"application/json")};
             }
             catch (Exception ex)
             {
@@ -68,21 +90,32 @@ namespace XRMOutlookAddIn
         
     }
 
-    public class RootValue
+    internal class RootValue
     {
-        public List<value> value;
+        public List<Value> value;
     }
 
-    public class value
+    internal class Value
     {
         public string id { get; set; }
         public string webUrl { get; set; }
-        public fields fields { get; set; }
+        public Fields fields { get; set; }
     }
 
-    public class fields
+    internal class Fields
     {
         public string ConfigKey { get; set; }
         public string ConfigValue { get; set; }
+        public string ClientName { get; set; }
+        public string StakeholderName { get; set; }
+    }
+
+    internal class ConfigData
+    {
+        public string SiteCollectionUrls { get; set; }
+        public string Lists { get; set; }
+        public string CaseStatusFilter { get; set; }
+        public string ProjectStatusFilter { get; set; }
+
     }
 }
