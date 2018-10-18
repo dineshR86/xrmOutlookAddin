@@ -12,9 +12,11 @@
 
     <!-- Office JavaScript API -->
     <script type="text/javascript" src="https://appsforoffice.microsoft.com/lib/1.1/hosted/office.debug.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-select/1.13.2/js/i18n/defaults-*.min.js"></script>
 
     <!-- LOCAL -->
     <link rel="stylesheet" href="node_modules/bootstrap/dist/css/bootstrap.min.css" />
+    <link rel="stylesheet" href="node_modules/bootstrap-select/dist/css/bootstrap-select.min.css" />
 
     <!-- CDN -->
     <!-- For the Office UI Fabric, go to http://aka.ms/office-ui-fabric to learn more. -->
@@ -39,10 +41,10 @@
             </select>
             <small id="sitecollectionhelp" class="form-text text-muted">Please select a sitecollection</small>
         </div>
-        <div class="form-group">
-            <label for="lists">Lists</label>
-            <select class="form-control" id="lists">
-                <option value="" selected>-select-</option>
+        <div class="form-group" id="lists" style="display: none">
+            <label for="listsdd">Lists</label>
+            <select class="form-control" id="listsdd">
+                <option value="select" selected>-select-</option>
                 <option value="list1">List1</option>
                 <option value="list2">List2</option>
                 <option value="list3">List3</option>
@@ -82,6 +84,15 @@
                 <option value="stakeholder3">Stakeholder3</option>
             </select>
         </div>
+        <div class="form-group" id="xrmitems">
+            <label for="xrmitemsDD">Items</label>
+            <select class="form-control selectpicker" data-live-search="true" id="xrmitemsDD" data-hide-disabled="true">
+                <option value="item1" >Item1</option>
+                <option value="item2" >Item2</option>
+                <option value="item3" >Item3</option>
+            </select>
+        </div>
+        
         <div class="form-check form-check-inline">
             <input class="form-check-input" type="checkbox" id="saveemail" value="email">
             <label class="form-check-label" for="saveemail">Email</label>
@@ -95,6 +106,7 @@
     </div>
 
     <script type="text/javascript" src="node_modules/jquery/dist/jquery.js"></script>
+    <script type="text/javascript" src="node_modules/bootstrap-select/dist/js/bootstrap-select.min.js"></script>
 </body>
 
 </html>
