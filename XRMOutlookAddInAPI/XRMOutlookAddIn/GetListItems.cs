@@ -42,17 +42,12 @@ namespace XRMOutlookAddIn
             try
             {
                 string rel = new Uri(sitecollection).AbsolutePath;
-                string requestUrl = "";
+                string siteurl = "";
                 // sample graph api call with filter https://graph.microsoft.com/v1.0/sites/oaktondidata.sharepoint.com/lists('XRMCases')/items?expand=fields(select=Title,StatusLookupId)&filter=fields/StatusLookupId eq '3'
-                if (rel == "/")
-                {
-                    requestUrl = string.Format("https://graph.microsoft.com/v1.0/sites/{0}/lists('{1}')/items", host, listname);
-                }
-                else
-                {
-                     requestUrl = string.Format("https://graph.microsoft.com/v1.0/sites/{0}:{1}/lists('{2}')/items", host, rel,listname);
-                }
-                
+                siteurl = rel == "/" ? host : string.Format("{0}:{1}", host, rel);
+
+                string requestUrl = string.Format("https://graph.microsoft.com/v1.0/sites/{0}/lists/{1}/items?expand=fields(select=Title,{2})&filter=fields/{2} eq '{3}'&select=id,fields", siteurl,listname,fieldname,fieldvalue);
+
                 var authenticationContext = new AuthenticationContext(authString, false);
 
                 ClientCredential clientCred = new ClientCredential(clientId, clientSecret);
@@ -72,8 +67,17 @@ namespace XRMOutlookAddIn
 
                 HttpResponseMessage response = _sharedHttpClient.SendAsync(requestMsg).Result;
                 var content = await response.Content.ReadAsStringAsync();
-                
-                return new HttpResponseMessage(HttpStatusCode.OK) { Content = new StringContent(content) };
+                dynamic items = JsonConvert.DeserializeObject<RootValue>(content);
+                List<ItemData> datas = new List<ItemData>();
+                foreach (var item in items.value)
+                {
+                    ItemData data = new ItemData();
+                    data.ID = item.id;
+                    data.Title = item.fields.Title;
+                    datas.Add(data);
+                }
+
+                return new HttpResponseMessage(HttpStatusCode.OK) { Content = new StringContent(JsonConvert.SerializeObject(datas, Formatting.Indented), Encoding.UTF8, "application/json") };
             }
             catch (Exception ex)
             {
@@ -81,5 +85,12 @@ namespace XRMOutlookAddIn
                 return new HttpResponseMessage(HttpStatusCode.InternalServerError) { Content = new StringContent("Error") };
             }
         }
+    }
+
+    internal class ItemData
+    {
+        public string ID { get; set; }
+        public string Title { get; set; }
+
     }
 }

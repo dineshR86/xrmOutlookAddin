@@ -108,6 +108,7 @@ namespace XRMOutlookAddIn
         public string ConfigValue { get; set; }
         public string ClientName { get; set; }
         public string StakeholderName { get; set; }
+        public string Title { get; set; }
     }
 
     internal class ConfigData

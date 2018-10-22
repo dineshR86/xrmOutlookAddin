@@ -5,3 +5,7 @@
 /XRMOutlookAddInAPI/XRMOutlookAddIn/obj
 /XRMOutlookAddInAPI/XRMOutlookAddIn/bin/Debug/netstandard2.0
 /XRMOutlookAddInAPI/.vs/XRMOutlookAddIn/v15
+/XRMOutlookAddInAPI/XRMOutlookAddIn/bin/Release/netstandard2.0
+/XRMOutlookAddInAPI/.vs/XRMOutlookAddIn/DesignTimeBuild/.dtbcache
+/XRMOutlookAddinUI/.vscode/launch.json
+/XRMOutlookAddinUI/.vscode/launch.json

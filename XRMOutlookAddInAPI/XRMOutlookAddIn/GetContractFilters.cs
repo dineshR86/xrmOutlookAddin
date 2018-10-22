@@ -45,7 +45,7 @@ namespace XRMOutlookAddIn
                 string requestUrl = "https://graph.microsoft.com/v1.0/$batch";
                 log.LogInformation(string.Format("About to hit Graph endpoint: '{0}'.", requestUrl));
 
-                string body = "{\"requests\": [{\"url\": \"/sites/root/lists('Clients')/items?expand=fields(select=ClientName)&select=id,fields\",\"method\": \"GET\",\"id\": \"1\"},{\"url\": \"/sites/root/lists('Stakeholders')/items?expand=fields(select=StakeholderName)&select=id,fields\",\"method\": \"GET\",\"id\": \"2\"}]}";
+                string body = "{\"requests\": [{\"url\": \"/sites/root/lists('Clients')/items?expand=fields(select=ClientName)&select=id,fields\",\"method\": \"GET\",\"id\": \"1\"},{\"url\": \"/sites/root/lists('Stakeholders')/items?expand=fields(select=StakeholderName)&select=id,fields\",\"method\": \"GET\",\"id\": \"2\"},{\"url\": \"/sites/root/lists('Status')/items?expand=fields(select=Title)&select=id,fields\",\"method\": \"GET\",\"id\": \"3\"}]}";
                 HttpRequestMessage requestMsg = new HttpRequestMessage(new HttpMethod("POST"), requestUrl);
                 requestMsg.Headers.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
                 requestMsg.Headers.Authorization = new AuthenticationHeaderValue("Bearer", token);
@@ -56,20 +56,27 @@ namespace XRMOutlookAddIn
                 dynamic items = JsonConvert.DeserializeObject<RootObject>(content);
                 List<string> Clients = new List<string>();
                 List<string> Stakeholders = new List<string>();
+                List<string> Status = new List<string>();
                 foreach (var item in items.responses)
                 {
                     if (item.id == "1")
                     {
                         foreach (var val in item.body.value)
                         {
-                            Clients.Add(val.fields.ClientName);
+                            Clients.Add(string.Format("{0},{1}",val.fields.ClientName,val.id));
+                        }
+                    }else if (item.id == "3")
+                    {
+                        foreach (var val in item.body.value)
+                        {
+                            Status.Add(string.Format("{0},{1}", val.fields.Title, val.id));
                         }
                     }
                     else
                     {
                         foreach (var val in item.body.value)
                         {
-                            Stakeholders.Add(val.fields.StakeholderName);
+                            Stakeholders.Add(string.Format("{0},{1}", val.fields.StakeholderName, val.id));
                         }
                     }
                 }
@@ -77,6 +84,7 @@ namespace XRMOutlookAddIn
                 FilterObject filterdata = new FilterObject();
                 filterdata.Clients = Clients;
                 filterdata.Stakeholders = Stakeholders;
+                filterdata.Status = Status;
                 return new HttpResponseMessage(HttpStatusCode.OK) { Content = new StringContent(JsonConvert.SerializeObject(filterdata, Formatting.Indented), Encoding.UTF8, "application/json") };
             }
             catch (Exception ex)
@@ -108,5 +116,6 @@ namespace XRMOutlookAddIn
     {
         public List<string> Clients { get; set; }
         public List<string> Stakeholders { get; set; }
+        public List<string> Status { get; set; }
     }
 }
