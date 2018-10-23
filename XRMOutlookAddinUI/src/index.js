@@ -10,8 +10,10 @@ var queryobj = {
     list: "",
     statusfilter: "",
     clientfilter: "",
+    clientfield: "",
     stakeholderfilter: "",
-    filterfield:""
+    stakeholderfield: "",
+    filterfield: ""
 }
 
 var mailitem = {
@@ -46,8 +48,19 @@ async function run() {
 
 
 function getListItems(querydata) {
-    $("#xrmitems").css("display", "block");
-    var querystring = "sc="+querydata.sitecollection+"&list="+querydata.list+"&ff="+querydata.filterfield+"&val="+querydata.statusfilter;
+    
+    var querystring="";
+    if (querydata.clientfield.length > 0 && querydata.stakeholderfield.length > 0) {
+        querystring = "sc=" + querydata.sitecollection + "&list=" + querydata.list + "&ff=" + querydata.clientfield + "&val=" + querydata.clientfilter+ "&ff1=" + querydata.stakeholderfield + "&val1=" + querydata.stakeholderfilter;
+    } else if(querydata.clientfield.length > 0){
+        querystring = "sc=" + querydata.sitecollection + "&list=" + querydata.list + "&ff=" + querydata.clientfield + "&val=" + querydata.clientfilter;
+    }else if(querydata.stakeholderfield.length > 0){
+        querystring = "sc=" + querydata.sitecollection + "&list=" + querydata.list + "&ff=" + querydata.stakeholderfield + "&val=" + querydata.stakeholderfilter;
+    }
+    else {
+        querystring = "sc=" + querydata.sitecollection + "&list=" + querydata.list + "&ff=" + querydata.filterfield + "&val=" + querydata.statusfilter;
+    }
+
     console.log(querystring);
     fetchListItems(querystring);
     // //Office.context.mailbox.item.to.getAsync(getToAddress);
@@ -103,19 +116,24 @@ function loadData() {
         var parentselect = optionselected.prevObject;
         if (parentselect[0].id == "casestatus") {
             queryobj.statusfilter = optionselected.val();
-            queryobj.filterfield="StatusLookupId";
+            queryobj.filterfield = "StatusLookupId";
         } else if (parentselect[0].id == "projectstatus") {
             queryobj.statusfilter = optionselected.val();
-            queryobj.filterfield="";
-        }
-        else if (parentselect[0].id == "relatedClient") {
+            queryobj.filterfield = "Status";
+        } else if (parentselect[0].id == "relatedClient") {
             queryobj.clientfilter = optionselected.val();
+            queryobj.clientfield = "Client_x0020_Contract_x0020_PartLookupId";
         } else if (parentselect[0].id == "relatedStakeholder") {
             queryobj.stakeholderfilter = optionselected.val();
+            queryobj.stakeholderfield = "Stakeholder_x0020_Contract_x0020LookupId";
         }
 
-        console.log(queryobj);
-        console.log(mailitem);
+        $("#btnFetch").css("display", "block");
+    });
+
+    // event handler for fetch
+    $("#btnFetch").click(function(event){
+        $("#xrmitems").css("display", "block");
         getListItems(queryobj);
     });
 }
@@ -170,10 +188,13 @@ function fetchContractFilterData() {
     });
 }
 
-function fetchListItems(queryString){
+function fetchListItems(queryString) {
     console.log("Fetching list item data");
+    $("#ddsaveemail").css("display", "block");
+    $("#ddsaveattachments").css("display", "block");
+    $("#btnSave").css("display", "block");
     $.ajax({
-        url: "https://xrmoutlookaddin.azurewebsites.net/api/GetListItems?code=nL0I4H0QhnTBUU7fXOMrY4WB0oJ3tZc5TMk0mtBpxM168KGJUJthng==&"+queryString,
+        url: "https://xrmoutlookaddin.azurewebsites.net/api/GetListItems?code=nL0I4H0QhnTBUU7fXOMrY4WB0oJ3tZc5TMk0mtBpxM168KGJUJthng==&" + queryString,
         method: "Get",
         headers: { "Accept": "application/json;odata=verbose" },
         success: function (data) {
@@ -183,6 +204,7 @@ function fetchListItems(queryString){
             });
             $('#xrmitemsDD').selectpicker();
             $('#xrmitemsDD').addClass("selectpicker");
+            $("#btnFetch").css("display", "none");
         },
         error: function (data) { console.log(data); }
     });

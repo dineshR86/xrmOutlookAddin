@@ -37,6 +37,8 @@ namespace XRMOutlookAddIn
             string listname = req.Query["list"];
             string fieldname = req.Query["ff"];
             string fieldvalue = req.Query["val"];
+            string fieldname1 = req.Query["ff1"];
+            string fieldvalue1 = req.Query["val1"];
 
 
             try
@@ -45,8 +47,16 @@ namespace XRMOutlookAddIn
                 string siteurl = "";
                 // sample graph api call with filter https://graph.microsoft.com/v1.0/sites/oaktondidata.sharepoint.com/lists('XRMCases')/items?expand=fields(select=Title,StatusLookupId)&filter=fields/StatusLookupId eq '3'
                 siteurl = rel == "/" ? host : string.Format("{0}:{1}", host, rel);
+                string requestUrl = "";
+                if (!string.IsNullOrEmpty(fieldname1))
+                {
+                    requestUrl = string.Format("https://graph.microsoft.com/v1.0/sites/{0}/lists/{1}/items?expand=fields(select=Title,{2})&filter=fields/{2} eq '{3}'and fields/{4} eq '{5}'&select=id,fields", siteurl, listname, fieldname, fieldvalue,fieldname1,fieldvalue1);
+                }
+                else {
+                    requestUrl = string.Format("https://graph.microsoft.com/v1.0/sites/{0}/lists/{1}/items?expand=fields(select=Title,{2})&filter=fields/{2} eq '{3}'&select=id,fields", siteurl, listname, fieldname, fieldvalue);
+                }
 
-                string requestUrl = string.Format("https://graph.microsoft.com/v1.0/sites/{0}/lists/{1}/items?expand=fields(select=Title,{2})&filter=fields/{2} eq '{3}'&select=id,fields", siteurl,listname,fieldname,fieldvalue);
+                 
 
                 var authenticationContext = new AuthenticationContext(authString, false);
 
