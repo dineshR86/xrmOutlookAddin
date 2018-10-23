@@ -84,11 +84,12 @@ function loadData() {
             $("#lists").css("display", "block");
             queryobj.sitecollection = optionselected.val();
         }
-        console.log(optionselected.text());
+        $(this).attr("disabled","disabled");
+        //console.log(optionselected.text());
     });
 
     //Event handler for lists change event
-    $("#lists").on("change", function (event) {
+    $("#listsdd").on("change", function (event) {
         var optionselected = $(this).find("option:selected");
         if (optionselected.text() == "-select-") {
             $("#casefilter").css("display", "none");
@@ -108,6 +109,7 @@ function loadData() {
             $("#contractfilter").css("display", "block");
         }
         queryobj.list = optionselected.val();
+        $("#listsdd").attr("disabled","disabled");
     });
 
     //event handler for filter change event
