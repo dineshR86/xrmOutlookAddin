@@ -33,32 +33,31 @@ namespace XRMOutlookAddIn
         [FunctionName("SaveItem")]
         public static async Task<HttpResponseMessage> Run([HttpTrigger(AuthorizationLevel.Function, "post", Route = null)] HttpRequestMessage req, ILogger log)
         {
-//            {
-//                "Subject":"TestEmail",
-//	"To":"dinesh.gudapati",
-//	"Message":"this is testemail",
-//	"From":"dinesh_gudapati",
-//	"Title":"1234-2345-3456-4567",
-//	"Conversation_x0020_Topic":"TestEmail",
-//	"Received":"123456",
-//	"Related_x0020_Item_x0020_Id":"23",
-//	"Related_x0020_Item_x0020_List_x0020_Id":"lists/Projects",
-//	"sitecollectionUrl":"https://oaktondidata.sharepoint.com/sites/Test3",
-//	"listname":"Outlook Emails"
-//}
             log.LogInformation("C# HTTP trigger function processed a request.");
             try
             {
-                MailData fields = await req.Content.ReadAsAsync<MailData>();
+                GetData fields = await req.Content.ReadAsAsync<GetData>();
+                MailData postFields = new MailData()
+                {
+                    Subject = fields.Subject,
+                    To = fields.To,
+                    Message = fields.Message,
+                    From = fields.From,
+                    conversationId = fields.ConversationId,
+                    conversationTopic = fields.ConversationTopic,
+                    received = fields.Received,
+                    itemid = fields.itemid,
+                    listid = fields.listid
+                };
+                PostData data = new PostData();
+                data.fields = postFields;
+                var posdata = JsonConvert.SerializeObject(data);
+
                 string rel = new Uri(fields.sitecollectionUrl).AbsolutePath;
                 string siteurl = "";
                 siteurl = rel == "/" ? host : string.Format("{0}:{1}", host, rel);
                 string listname = fields.listname;
-                fields.sitecollectionUrl = string.Empty;
-                fields.listname = string.Empty;
-                PostData data = new PostData();
-                data.fields = fields;
-                var posdata = JsonConvert.SerializeObject(data);
+                string requesturl = string.Format("https://graph.microsoft.com/v1.0/sites/{0}:/lists('{1}')/items", siteurl, listname);
 
                 var authenticationContext = new AuthenticationContext(authString, false);
                 ClientCredential clientCred = new ClientCredential(clientId, clientSecret);
@@ -69,7 +68,6 @@ namespace XRMOutlookAddIn
                     log.LogInformation("successfully obtained access token");
                 }
 
-                string requesturl = string.Format("https://graph.microsoft.com/v1.0/sites/{0}:/lists('{1}')/items", siteurl, listname);
                 HttpRequestMessage requestMsg = new HttpRequestMessage(new HttpMethod("POST"), requesturl);
                 requestMsg.Headers.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
                 requestMsg.Headers.Authorization = new AuthenticationHeaderValue("Bearer", token);
@@ -107,14 +105,25 @@ namespace XRMOutlookAddIn
         public string received { get; set; }
         [JsonProperty(PropertyName = "Related_x0020_Item_x0020_Id")]
         public string itemid { get; set; }
-        [JsonProperty(PropertyName = "Related_x0020_Item_x0020_List_x0020_Id")]
+        [JsonProperty(PropertyName = "Related_x0020_Item_x0020_List_x0")]
         public string listid { get; set; }
-        public string sitecollectionUrl { get; set; }
-        public string listname { get; set; }
 
     }
 
-
+    internal class GetData
+    {
+        public string Subject { get; set; }
+        public string To { get; set; }
+        public string Message { get; set; }
+        public string From { get; set; }
+        public string ConversationId { get; set; }
+        public string ConversationTopic { get; set; }
+        public string Received { get; set; }
+        public string itemid { get; set; }
+        public string listid { get; set; }
+        public string sitecollectionUrl { get; set; }
+        public string listname { get; set; }
+    }
 
     internal class PostData
     {
