@@ -17,20 +17,25 @@ var queryobj = {
 }
 
 var mailitem = {
-    subject: "",
-    to: "",
-    from: "",
-    conversation: "",
-    created: "",
-    body: ""
+    Subject: "",
+    To: "",
+    From: "",
+    ConversationId: "",
+    Received: "",
+    Message: "",
+    ConversationTopic:"",
+    itemid:"",
+    listid:"",
+    sitecollectionUrl:"",
+    listname:""
 }
 
-$(document).ready(function () {
-    fetchConfigData();
-   fetchContractFilterData();
-   loadData();
-    //getMailData(Office.context.mailbox.item);
-});
+// $(document).ready(function () {
+//     fetchConfigData();
+//    fetchContractFilterData();
+//    loadData();
+//     //getMailData(Office.context.mailbox.item);
+// });
 
 // The initialize function must be run each time a new page is loaded
 Office.initialize = (reason) => {
