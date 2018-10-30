@@ -44,7 +44,7 @@ Office.initialize = (reason) => {
         fetchConfigData();
        fetchContractFilterData();
        loadData();
-        getMailData(Office.context.mailbox.item);
+    //getMailAttachments(Office.context.mailbox.item);
     });
 };
 
@@ -80,6 +80,7 @@ function loadData() {
         } else {
             $("#lists").css("display", "block");
             queryobj.sitecollection = optionselected.val();
+            mailitem.sitecollectionUrl=optionselected.val();
         }
         $(this).attr("disabled", "disabled");
         //console.log(optionselected.text());
@@ -106,6 +107,8 @@ function loadData() {
             $("#contractfilter").css("display", "block");
         }
         queryobj.list = optionselected.val();
+        mailitem.listname=optionselected.val();
+        mailitem.listid="Lists/"+optionselected.val();
         $("#listsdd").attr("disabled", "disabled");
     });
 
@@ -134,6 +137,23 @@ function loadData() {
     $("#btnFetch").click(function (event) {
         $("#xrmitems").css("display", "block");
         getListItems(queryobj);
+    });
+
+    $("#xrmitemsDD").on("change",function(event){
+        $("#btnSave").css("display","block");
+        mailitem.itemid=$(this).find("option:selected").val();
+    });
+
+    $("#btnSave").click(function (event) {
+        if($("#saveemail").is(":checked")||$("#saveattachments").is(":checked")){
+            getMailData(Office.context.mailbox.item);
+            //harcoding the value due to insufficent test data
+            mailitem.sitecollectionUrl="https://oaktondidata.sharepoint.com/sites/Test3";
+            mailitem.listname="Outlook Emails"
+            saveMailData();
+        }else{
+            console.log("Saveemail must be checked");
+        }
     });
 }
 
@@ -196,7 +216,6 @@ function fetchListItems(queryString) {
     console.log("Fetching list item data");
     $("#ddsaveemail").css("display", "block");
     $("#ddsaveattachments").css("display", "block");
-    $("#btnSave").css("display", "block");
     $.ajax({
         url: "https://xrmoutlookaddin.azurewebsites.net/api/GetListItems?code=nL0I4H0QhnTBUU7fXOMrY4WB0oJ3tZc5TMk0mtBpxM168KGJUJthng==&" + queryString,
         method: "Get",
@@ -218,26 +237,37 @@ function fetchListItems(queryString) {
 function getMailData(item) {
     $(".loader").css("display", "block");
     // //Office.context.mailbox.item.to.getAsync(getToAddress);
-    mailitem.subject = item.subject;
-    mailitem.from = buildEmailAddressString(item.from);
-    mailitem.created = item.dateTimeCreated;
-    mailitem.conversation = item.conversationId;
-    Office.context.mailbox.item.body.getAsync('text', function (result) {
+    mailitem.Subject = item.subject;
+    mailitem.ConversationTopic=item.subject;
+    mailitem.From = buildEmailAddressString(item.from);
+    mailitem.Received = new Date(item.dateTimeCreated).toISOString();
+    mailitem.ConversationId = item.conversationId;
+    item.body.getAsync('text', function (result) {
         if (result.status === 'succeeded') {
-            mailitem.body = result.value;
+            mailitem.Message = result.value;
         }
     });
 
-    mailitem.to=buildToEmailAddressesString(item.to);
-
-    //   Office.context.mailbox.item.body.getAsync('html', function(result){
-    //     if (result.status === 'succeeded') {
-    //         console.log(result.value);
-    //     }
-    //   });
+    mailitem.To=buildToEmailAddressesString(item.to);
 
     console.log(mailitem);
     $(".loader").css("display", "none");
+}
+
+function saveMailData(){
+   console.log(JSON.stringify(mailitem));
+    $.ajax({
+        url:"https://xrmoutlookaddin.azurewebsites.net/api/SaveItem?code=J//vdaiOH0Boxe0sMc54Bl2kCYgiHZaNqKi8Td7S20H0gMjeBsDZfA==",
+        method:"POST",
+        data:JSON.stringify(mailitem),
+        headers:{ "Accept": "application/json;odata=verbose", "content-type": "application/json;odata=verbose" },
+        success:function(data){
+            console.log(data);
+        },
+        error:function(error){
+            console.log(error);
+        }
+    })
 }
 
 // Format an EmailAddressDetails object as
@@ -263,5 +293,22 @@ function getMailData(item) {
     }
     
     return "None";
+  }
+
+  function getMailAttachments(item){
+    var outputString = "";
+
+    if (item.attachments.length > 0) {
+      for (var i = 0 ; i < item.attachments.length ; i++) {
+        var _att = item.attachments[i];
+        outputString += "<BR>" + i + ". Name: ";
+        outputString += _att.name;
+        outputString += "<BR>ID: " + _att.id;
+        outputString += "<BR>contentType: " + _att.contentType;
+        outputString += "<BR>size: " + _att.size;
+        outputString += "<BR>attachmentType: " + _att.attachmentType;
+        outputString += "<BR>isInline: " + _att.isInline;
+      }
+    }
   }
 

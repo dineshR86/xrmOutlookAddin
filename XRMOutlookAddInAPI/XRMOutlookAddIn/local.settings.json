@@ -1,7 +1,13 @@
 {
-    "IsEncrypted": false,
-    "Values": {
-        "AzureWebJobsStorage": "UseDevelopmentStorage=true",
-        "FUNCTIONS_WORKER_RUNTIME": "dotnet"
-    }
+  "IsEncrypted": false,
+  "Values": {
+    "AzureWebJobsStorage": "UseDevelopmentStorage=true",
+    "FUNCTIONS_WORKER_RUNTIME": "dotnet",
+    "ResourceId": "https://graph.microsoft.com",
+    "TenantId": "70aa9dc9-726c-4d05-88f3-519ef4a1f1ac",
+    "AuthString": "https://login.microsoftonline.com/",
+    "ClientId": "001bf6ce-45f9-4af4-bd57-ec96ea220e21",
+    "ClientSecret": "LnLN95vmqecwdaMv5AUq54g7uO3vMKjmvtJU5jlTAAo=",
+    "Host": "oaktondidata.sharepoint.com"
+  }
 }

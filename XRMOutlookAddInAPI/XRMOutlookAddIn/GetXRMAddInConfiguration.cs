@@ -21,13 +21,7 @@ using System.Text;
 namespace XRMOutlookAddIn
 {
     public static class GetXRMAddInConfiguration
-    {
-        public static string resourceId = "https://graph.microsoft.com";
-        public static string tenantId = "70aa9dc9-726c-4d05-88f3-519ef4a1f1ac";
-        public static string authString = "https://login.microsoftonline.com/" + tenantId;
-        public static string upn = string.Empty;
-        public static string clientId = "001bf6ce-45f9-4af4-bd57-ec96ea220e21";
-        public static string clientSecret = "LnLN95vmqecwdaMv5AUq54g7uO3vMKjmvtJU5jlTAAo=";
+    {   
         private static HttpClient _sharedHttpClient = new HttpClient();
 
         [FunctionName("GetXRMAddInConfiguration")]
@@ -35,9 +29,15 @@ namespace XRMOutlookAddIn
         {
             log.LogInformation("C# HTTP trigger function processed a request.");
             try
-            {
-                var authenticationContext = new AuthenticationContext(authString, false);
+            {   
+                //Getting the Application settings
+                string resourceId = Environment.GetEnvironmentVariable("ResourceId", EnvironmentVariableTarget.Process);
+                string tenantid=Environment.GetEnvironmentVariable("TenantId", EnvironmentVariableTarget.Process);
+                string authString = Environment.GetEnvironmentVariable("AuthString", EnvironmentVariableTarget.Process) + tenantid;
+                string clientId= Environment.GetEnvironmentVariable("ClientId", EnvironmentVariableTarget.Process);
+                string clientSecret= Environment.GetEnvironmentVariable("ClientSecret", EnvironmentVariableTarget.Process);
 
+                var authenticationContext = new AuthenticationContext(authString, false);
                 ClientCredential clientCred = new ClientCredential(clientId, clientSecret);
                 AuthenticationResult authenticationResult = await authenticationContext.AcquireTokenAsync(resourceId, clientCred);
                 string token = authenticationResult.AccessToken;

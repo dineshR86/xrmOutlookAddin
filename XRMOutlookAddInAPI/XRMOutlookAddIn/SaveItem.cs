@@ -21,19 +21,20 @@ namespace XRMOutlookAddIn
 {
     public static class SaveItem
     {
-        public static string resourceId = "https://graph.microsoft.com";
-        public static string tenantId = "70aa9dc9-726c-4d05-88f3-519ef4a1f1ac";
-        public static string authString = "https://login.microsoftonline.com/" + tenantId;
-        public static string upn = string.Empty;
-        public static string clientId = "001bf6ce-45f9-4af4-bd57-ec96ea220e21";
-        public static string clientSecret = "LnLN95vmqecwdaMv5AUq54g7uO3vMKjmvtJU5jlTAAo=";
         private static HttpClient _sharedHttpClient = new HttpClient();
-        private static string host = "oaktondidata.sharepoint.com";
+        
 
         [FunctionName("SaveItem")]
         public static async Task<HttpResponseMessage> Run([HttpTrigger(AuthorizationLevel.Function, "post", Route = null)] HttpRequestMessage req, ILogger log)
-        {
+        {   
             log.LogInformation("C# HTTP trigger function processed a request.");
+            //Getting the Application settings
+            string resourceId = Environment.GetEnvironmentVariable("ResourceId", EnvironmentVariableTarget.Process);
+            string tenantid = Environment.GetEnvironmentVariable("TenantId", EnvironmentVariableTarget.Process);
+            string authString = Environment.GetEnvironmentVariable("AuthString", EnvironmentVariableTarget.Process) + tenantid;
+            string clientId = Environment.GetEnvironmentVariable("ClientId", EnvironmentVariableTarget.Process);
+            string clientSecret = Environment.GetEnvironmentVariable("ClientSecret", EnvironmentVariableTarget.Process);
+            string host = Environment.GetEnvironmentVariable("Host", EnvironmentVariableTarget.Process);
             try
             {
                 GetData fields = await req.Content.ReadAsAsync<GetData>();
@@ -55,9 +56,9 @@ namespace XRMOutlookAddIn
 
                 string rel = new Uri(fields.sitecollectionUrl).AbsolutePath;
                 string siteurl = "";
-                siteurl = rel == "/" ? host : string.Format("{0}:{1}", host, rel);
+                siteurl = rel == "/" ? host : string.Format("{0}:{1}:", host, rel);
                 string listname = fields.listname;
-                string requesturl = string.Format("https://graph.microsoft.com/v1.0/sites/{0}:/lists('{1}')/items", siteurl, listname);
+                string requesturl = string.Format("https://graph.microsoft.com/v1.0/sites/{0}/lists('{1}')/items", siteurl, listname);
 
                 var authenticationContext = new AuthenticationContext(authString, false);
                 ClientCredential clientCred = new ClientCredential(clientId, clientSecret);
@@ -75,7 +76,7 @@ namespace XRMOutlookAddIn
                 HttpResponseMessage response = _sharedHttpClient.SendAsync(requestMsg).Result;
                 var content = await response.Content.ReadAsStringAsync();
 
-                return new HttpResponseMessage(HttpStatusCode.OK) { Content = new StringContent("Success") };
+                return new HttpResponseMessage(HttpStatusCode.OK) { Content = new StringContent(content) };
             }
             catch (Exception ex)
             {
