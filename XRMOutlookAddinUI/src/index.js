@@ -41,10 +41,10 @@ var mailitem = {
 Office.initialize = (reason) => {
     //when you browse the page outside outlook load the document.ready outside the this method.
     $(document).ready(function () {
-        fetchConfigData();
-       fetchContractFilterData();
-       loadData();
-    //getMailAttachments(Office.context.mailbox.item);
+    //     fetchConfigData();
+    //    fetchContractFilterData();
+    //    loadData();
+    getMailAttachments(Office.context.mailbox.item);
     });
 };
 
@@ -295,20 +295,12 @@ function saveMailData(){
     return "None";
   }
 
-  function getMailAttachments(item){
-    var outputString = "";
-
-    if (item.attachments.length > 0) {
-      for (var i = 0 ; i < item.attachments.length ; i++) {
-        var _att = item.attachments[i];
-        outputString += "<BR>" + i + ". Name: ";
-        outputString += _att.name;
-        outputString += "<BR>ID: " + _att.id;
-        outputString += "<BR>contentType: " + _att.contentType;
-        outputString += "<BR>size: " + _att.size;
-        outputString += "<BR>attachmentType: " + _att.attachmentType;
-        outputString += "<BR>isInline: " + _att.isInline;
-      }
+  function getMailAttachments(){
+    var attachdata={
+        UserId:Office.context.mailbox.userProfile.emailAddress,
+        MessageId:Office.context.mailbox.convertToRestId(Office.context.mailbox.item.itemId,Office.MailboxEnums.RestVersion.v2_0)
     }
+
+    console.log(attachdata);
   }
 
