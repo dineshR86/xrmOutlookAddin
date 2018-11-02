@@ -45,12 +45,12 @@ namespace XRMOutlookAddIn
                 ClientCredential clientCred = new ClientCredential(clientId, clientSecret);
                 AuthenticationResult authenticationResult = await authenticationContext.AcquireTokenAsync(resourceId, clientCred);
                 string token = authenticationResult.AccessToken;
-                //HttpRequestMessage requestMsg = new HttpRequestMessage(new HttpMethod("GET"), requesturl);
-                //requestMsg.Headers.Authorization = new AuthenticationHeaderValue("Bearer", token);
-                
-                //HttpResponseMessage response = _sharedHttpClient.SendAsync(requestMsg).Result;
+                HttpRequestMessage requestMsg = new HttpRequestMessage(new HttpMethod("GET"), requesturl);
+                requestMsg.Headers.Authorization = new AuthenticationHeaderValue("Bearer", token);
 
-                //var content = await response.Content.ReadAsStringAsync();
+                HttpResponseMessage response = _sharedHttpClient.SendAsync(requestMsg).Result;
+
+                var content = await response.Content.ReadAsStringAsync();
                 await CheckForFolder(string.Format("{0}-{1}", props.ItemTitle, props.ItemID), ContractDriveID, token);
                 dynamic items = JsonConvert.DeserializeObject<RootAttachment>("");
 
@@ -70,6 +70,7 @@ namespace XRMOutlookAddIn
 
         private static async Task<Boolean> UploadFileToLibrary(string data,string docName,string accessToken,string folderName,string driveid)
         {
+            //http://nullablecode.com/2018/04/ms-graph-api-and-sharepoint-online/ neatly explained the process for uploading of documents
             string uploadUri = string.Format("https://graph.microsoft.com/v1.0/drives/{0}/root:/{1}/{2}:/content", driveid, folderName,docName);
             HttpRequestMessage uploadRequest = new HttpRequestMessage(new HttpMethod("PUT"), uploadUri);
             uploadRequest.Headers.Authorization = new AuthenticationHeaderValue("Bearer", accessToken);
@@ -128,6 +129,7 @@ namespace XRMOutlookAddIn
         public string ItemTitle { get; set; }
 
         public string ItemID { get; set; }
+        public string ListName { get; set; }
     }
 
     internal class Attachment
