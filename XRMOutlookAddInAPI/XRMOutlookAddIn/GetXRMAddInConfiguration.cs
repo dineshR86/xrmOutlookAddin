@@ -106,7 +106,7 @@ namespace XRMOutlookAddIn
     {
         public string ConfigKey { get; set; }
         public string ConfigValue { get; set; }
-        public string ClientName { get; set; }
+        public string Client_x0020_Name { get; set; }
         public string StakeholderName { get; set; }
         public string Title { get; set; }
     }

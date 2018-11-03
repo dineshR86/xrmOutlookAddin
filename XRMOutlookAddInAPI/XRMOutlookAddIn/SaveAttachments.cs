@@ -1,22 +1,17 @@
-using System;
-using System.IO;
-using System.Threading.Tasks;
-using Microsoft.AspNetCore.Mvc;
 using Microsoft.Azure.WebJobs;
 using Microsoft.Azure.WebJobs.Extensions.Http;
-using Microsoft.AspNetCore.Http;
-using Microsoft.Azure.WebJobs.Host;
 using Microsoft.Extensions.Logging;
+using Microsoft.IdentityModel.Clients.ActiveDirectory;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
-using Microsoft.IdentityModel.Clients.ActiveDirectory;
+using System;
+using System.Collections.Generic;
+using System.Linq;
 using System.Net;
 using System.Net.Http;
 using System.Net.Http.Headers;
-using System.Reflection;
-using System.Collections;
-using System.Collections.Generic;
 using System.Text;
+using System.Threading.Tasks;
 
 namespace XRMOutlookAddIn
 {
@@ -35,11 +30,15 @@ namespace XRMOutlookAddIn
             string clientId = Environment.GetEnvironmentVariable("ClientId", EnvironmentVariableTarget.Process);
             string clientSecret = Environment.GetEnvironmentVariable("ClientSecret", EnvironmentVariableTarget.Process);
             string ContractDriveID= Environment.GetEnvironmentVariable("ContractDriveID", EnvironmentVariableTarget.Process);
+            string CaseDriveID = Environment.GetEnvironmentVariable("CaseDriveID", EnvironmentVariableTarget.Process);
             string host = Environment.GetEnvironmentVariable("Host", EnvironmentVariableTarget.Process);
 
             try
             {
                 AttachmentProps props = await req.Content.ReadAsAsync<AttachmentProps>();
+                string rel = new Uri(props.sitecollectionUrl).AbsolutePath;
+                string siteurl = "";
+                siteurl = rel == "/" ? host : string.Format("{0}:{1}", host, rel);
                 string requesturl = string.Format("https://graph.microsoft.com/v1.0/users/{0}/messages/{1}/attachments", props.UserId, props.MessageId);
                 var authenticationContext = new AuthenticationContext(authString, false);
                 ClientCredential clientCred = new ClientCredential(clientId, clientSecret);
@@ -47,16 +46,35 @@ namespace XRMOutlookAddIn
                 string token = authenticationResult.AccessToken;
                 HttpRequestMessage requestMsg = new HttpRequestMessage(new HttpMethod("GET"), requesturl);
                 requestMsg.Headers.Authorization = new AuthenticationHeaderValue("Bearer", token);
-
                 HttpResponseMessage response = _sharedHttpClient.SendAsync(requestMsg).Result;
-
                 var content = await response.Content.ReadAsStringAsync();
-                await CheckForFolder(string.Format("{0}-{1}", props.ItemTitle, props.ItemID), ContractDriveID, token);
-                dynamic items = JsonConvert.DeserializeObject<RootAttachment>("");
+                dynamic items = JsonConvert.DeserializeObject<RootAttachment>(content);
 
-                foreach(var item in items.value)
+                if (props.ListName.ToLower().Contains("project"))
                 {
-                    await UploadFileToLibrary(item.contentBytes, item.Name, token, string.Format("{0}-{1}", props.ItemTitle, props.ItemID), ContractDriveID);
+                    string driveid = await GetProjectDriveId(props.ItemID, siteurl, token);
+                    Boolean folderstatus= await CheckForFolder(string.Format("{0}-{1}", props.ItemTitle, props.ItemID), driveid, token);
+                    foreach (var item in items.value)
+                    {
+                        Boolean uploadstatus= await UploadFileToLibrary(item.contentBytes, item.Name, token, string.Format("{0}-{1}", props.ItemTitle, props.ItemID), driveid);
+                    }
+
+                }
+                else if (props.ListName.ToLower().Contains("cases"))
+                {
+                    Boolean folderstatus = await CheckForFolder(string.Format("{0}-{1}", props.ItemTitle, props.ItemID), CaseDriveID, token);
+                    foreach (var item in items.value)
+                    {
+                        Boolean uploadstatus = await UploadFileToLibrary(item.contentBytes, item.Name, token, string.Format("{0}-{1}", props.ItemTitle, props.ItemID), CaseDriveID);
+                    }
+                }
+                else if (props.ListName.ToLower().Contains("contract"))
+                {
+                    Boolean folderstatus = await CheckForFolder(string.Format("{0}-{1}", props.ItemTitle, props.ItemID), ContractDriveID, token);
+                    foreach (var item in items.value)
+                    {
+                        Boolean uploadstatus = await UploadFileToLibrary(item.contentBytes, item.Name, token, string.Format("{0}-{1}", props.ItemTitle, props.ItemID), ContractDriveID);
+                    }
                 }
 
                 return new HttpResponseMessage(HttpStatusCode.OK) { Content = new StringContent("Success") };
@@ -118,6 +136,34 @@ namespace XRMOutlookAddIn
                 }
             }
         }
+
+        private static async Task<string> GetProjectDriveId(string projectid, string relativeurl, string accessToken)
+        {
+            string projectreltiveurl = string.Format("{0}/projects/project{1}:", relativeurl, projectid);
+            string getdriveurl = string.Format("https://graph.microsoft.com/v1.0/sites/{0}/drives?$filter=name eq 'Files'",projectreltiveurl);
+            HttpRequestMessage gDriverequest = new HttpRequestMessage(new HttpMethod("GET"), getdriveurl);
+            gDriverequest.Headers.Authorization = new AuthenticationHeaderValue("Bearer", accessToken);
+            using (var gdriveresponse = await _sharedHttpClient.SendAsync(gDriverequest))
+            {
+                if (gdriveresponse.IsSuccessStatusCode)
+                {
+                    var json = JObject.Parse(await gdriveresponse.Content.ReadAsStringAsync());
+                    var value = json["value"].ToList();
+                    string id = string.Empty;
+                    foreach (var item in value)
+                    {
+                        id = item["id"].ToString();
+                    }
+
+                    return id;
+                }
+                else
+                {
+                    return "";
+                }
+            }
+   
+        }
     }
 
     internal class AttachmentProps
@@ -130,6 +176,7 @@ namespace XRMOutlookAddIn
 
         public string ItemID { get; set; }
         public string ListName { get; set; }
+        public string sitecollectionUrl { get; set; }
     }
 
     internal class Attachment

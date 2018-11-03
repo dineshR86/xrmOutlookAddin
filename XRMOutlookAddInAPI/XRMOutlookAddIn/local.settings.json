@@ -8,7 +8,8 @@
     "AuthString": "https://login.microsoftonline.com/",
     "ClientId": "60d69ebd-0b0a-4370-b7ce-8e869d2cf428",
     "ClientSecret": "E2OFXFH+jIKI/MUEz13P+x5JTOeadSz48b0NCWoSTyA=",
-    "Host": "oaktondidata.sharepoint.com",
-    "ContractDriveID": "b!X6iuQPHK9UeDjBmivhpk-qwHqLT-ZEdLsCyhhob5VR2Gw1vmxNYGRYQQLXGdBwfG"
+    "Host": "vssworks.sharepoint.com",
+    "ContractDriveID": "b!X6iuQPHK9UeDjBmivhpk-qwHqLT-ZEdLsCyhhob5VR2Gw1vmxNYGRYQQLXGdBwfG",
+    "CaseDriveID": "b!X6iuQPHK9UeDjBmivhpk-qwHqLT-ZEdLsCyhhob5VR0NRceFBlc5Q4xNWpGhJlzz"
   }
 }

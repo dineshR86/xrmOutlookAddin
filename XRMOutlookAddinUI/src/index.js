@@ -30,23 +30,23 @@ var mailitem = {
     listname:""
 }
 
-// $(document).ready(function () {
-//     fetchConfigData();
-//    fetchContractFilterData();
-//    loadData();
-//     //getMailData(Office.context.mailbox.item);
-// });
+$(document).ready(function () {
+    fetchConfigData();
+   fetchContractFilterData();
+   loadData();
+    //getMailData(Office.context.mailbox.item);
+});
 
 // The initialize function must be run each time a new page is loaded
-Office.initialize = (reason) => {
-    //when you browse the page outside outlook load the document.ready outside the this method.
-    $(document).ready(function () {
-    //     fetchConfigData();
-    //    fetchContractFilterData();
-    //    loadData();
-    getMailAttachments(Office.context.mailbox.item);
-    });
-};
+// Office.initialize = (reason) => {
+//     //when you browse the page outside outlook load the document.ready outside the this method.
+//     $(document).ready(function () {
+//        fetchConfigData();
+//     fetchContractFilterData();
+//     loadData();
+//     //getMailAttachments(Office.context.mailbox.item);
+//     });
+// };
 
 
 function getListItems(querydata) {
@@ -147,9 +147,9 @@ function loadData() {
     $("#btnSave").click(function (event) {
         if($("#saveemail").is(":checked")||$("#saveattachments").is(":checked")){
             getMailData(Office.context.mailbox.item);
-            //harcoding the value due to insufficent test data
-            mailitem.sitecollectionUrl="https://oaktondidata.sharepoint.com/sites/Test3";
-            mailitem.listname="Outlook Emails"
+            mailitem.sitecollectionUrl= $("#sitecollections").find("option:selected").val();
+            mailitem.listname="Outlook Emails";
+            getMailAttachments();
             saveMailData();
         }else{
             console.log("Saveemail must be checked");
@@ -298,9 +298,13 @@ function saveMailData(){
   function getMailAttachments(){
     var attachdata={
         UserId:Office.context.mailbox.userProfile.emailAddress,
-        MessageId:Office.context.mailbox.convertToRestId(Office.context.mailbox.item.itemId,Office.MailboxEnums.RestVersion.v2_0)
+        MessageId:Office.context.mailbox.convertToRestId(Office.context.mailbox.item.itemId,Office.MailboxEnums.RestVersion.v2_0),
+        ItemTitle: $("#xrmitemsDD").find("option:selected").text(),
+        ItemID:$("#xrmitemsDD").find("option:selected").val(),
+        ListName:$("#listsdd").find("option:selected").val(),
+        sitecollectionUrl:$("#sitecollections").find("option:selected").val()
     }
 
-    console.log(attachdata);
+    console.log(JSON.stringify(attachdata));
   }
 
