@@ -30,23 +30,23 @@ var mailitem = {
     listname:""
 }
 
-$(document).ready(function () {
-    fetchConfigData();
-   fetchContractFilterData();
-   loadData();
-    //getMailData(Office.context.mailbox.item);
-});
+// $(document).ready(function () {
+//     fetchConfigData();
+//    fetchContractFilterData();
+//    loadData();
+//     //getMailData(Office.context.mailbox.item);
+// });
 
-// The initialize function must be run each time a new page is loaded
-// Office.initialize = (reason) => {
-//     //when you browse the page outside outlook load the document.ready outside the this method.
-//     $(document).ready(function () {
-//        fetchConfigData();
-//     fetchContractFilterData();
-//     loadData();
-//     //getMailAttachments(Office.context.mailbox.item);
-//     });
-// };
+//The initialize function must be run each time a new page is loaded
+Office.initialize = (reason) => {
+    //when you browse the page outside outlook load the document.ready outside the this method.
+    $(document).ready(function () {
+       fetchConfigData();
+    fetchContractFilterData();
+    loadData();
+    //getMailAttachments(Office.context.mailbox.item);
+    });
+};
 
 
 function getListItems(querydata) {
@@ -146,11 +146,14 @@ function loadData() {
 
     $("#btnSave").click(function (event) {
         if($("#saveemail").is(":checked")||$("#saveattachments").is(":checked")){
-            getMailData(Office.context.mailbox.item);
-            mailitem.sitecollectionUrl= $("#sitecollections").find("option:selected").val();
-            mailitem.listname="Outlook Emails";
-            getMailAttachments();
-            saveMailData();
+            
+            if($("#saveemail").is(":checked")){
+                getMailData(Office.context.mailbox.item);
+            }
+
+            if($("#saveattachments").is(":checked")){
+                getMailAttachments();
+            } 
         }else{
             console.log("Saveemail must be checked");
         }
@@ -242,15 +245,17 @@ function getMailData(item) {
     mailitem.From = buildEmailAddressString(item.from);
     mailitem.Received = new Date(item.dateTimeCreated).toISOString();
     mailitem.ConversationId = item.conversationId;
+    mailitem.sitecollectionUrl= $("#sitecollections").find("option:selected").val();
+    mailitem.listname="Outlook Emails";
+    mailitem.To=buildToEmailAddressesString(item.to);
     item.body.getAsync('text', function (result) {
         if (result.status === 'succeeded') {
             mailitem.Message = result.value;
+            saveMailData();
         }
     });
-
-    mailitem.To=buildToEmailAddressesString(item.to);
-
     console.log(mailitem);
+    
     $(".loader").css("display", "none");
 }
 
@@ -296,6 +301,7 @@ function saveMailData(){
   }
 
   function getMailAttachments(){
+      //form the mail attachment object
     var attachdata={
         UserId:Office.context.mailbox.userProfile.emailAddress,
         MessageId:Office.context.mailbox.convertToRestId(Office.context.mailbox.item.itemId,Office.MailboxEnums.RestVersion.v2_0),
@@ -305,6 +311,22 @@ function saveMailData(){
         sitecollectionUrl:$("#sitecollections").find("option:selected").val()
     }
 
-    console.log(JSON.stringify(attachdata));
+    saveMailAttachments(attachdata);
+  }
+
+  function saveMailAttachments(data){
+    console.log(JSON.stringify(data));
+    $.ajax({
+        url:"https://xrmoutlookaddin.azurewebsites.net/api/SaveAttachments?code=LEPq9agv4sbGsxkBwissVEa4TraATCyoWvYG96n3FxCndQUXrMDGaQ==",
+        method:"POST",
+        data:JSON.stringify(data),
+        headers:{ "Accept": "application/json;odata=verbose", "content-type": "application/json;odata=verbose" },
+        success:function(data){
+            console.log(data);
+        },
+        error:function(error){
+            console.log(error);
+        }
+    });
   }
 
