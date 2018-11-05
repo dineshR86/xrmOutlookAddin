@@ -88,7 +88,7 @@ namespace XRMOutlookAddIn
 
     internal class MailData
     {
-        [JsonProperty(PropertyName = "Subject")]
+        [JsonProperty(PropertyName = "Title")]
         public string Subject { get; set; }
         [JsonProperty(PropertyName = "To")]
         public string To { get; set; }
@@ -97,16 +97,16 @@ namespace XRMOutlookAddIn
         [JsonProperty(PropertyName = "From")]
         public string From { get; set; }
 
-        [JsonProperty(PropertyName ="Title")]
+        [JsonProperty(PropertyName = "ConversationId")]
         public string conversationId { get; set; }
 
-        [JsonProperty(PropertyName = "Conversation_x0020_Topic")]
+        [JsonProperty(PropertyName = "ConversationTopic")]
         public string conversationTopic { get; set; }
         [JsonProperty(PropertyName = "Received")]
         public string received { get; set; }
-        [JsonProperty(PropertyName = "Related_x0020_Item_x0020_Id")]
+        [JsonProperty(PropertyName = "RelatedItemId")]
         public string itemid { get; set; }
-        [JsonProperty(PropertyName = "Related_x0020_Item_x0020_List_x0")]
+        [JsonProperty(PropertyName = "RelatedItemListId")]
         public string listid { get; set; }
 
     }

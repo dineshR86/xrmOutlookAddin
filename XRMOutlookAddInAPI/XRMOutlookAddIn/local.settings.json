@@ -4,12 +4,12 @@
     "AzureWebJobsStorage": "UseDevelopmentStorage=true",
     "FUNCTIONS_WORKER_RUNTIME": "dotnet",
     "ResourceId": "https://graph.microsoft.com",
-    "TenantId": "de38a5e5-3518-4123-8e94-8f7f2a6f7250",
+    "TenantId": "d3d8e52c-b3c6-4d7a-9857-34c82389369c",
     "AuthString": "https://login.microsoftonline.com/",
-    "ClientId": "60d69ebd-0b0a-4370-b7ce-8e869d2cf428",
-    "ClientSecret": "E2OFXFH+jIKI/MUEz13P+x5JTOeadSz48b0NCWoSTyA=",
-    "Host": "vssworks.sharepoint.com",
-    "ContractDriveID": "b!X6iuQPHK9UeDjBmivhpk-qwHqLT-ZEdLsCyhhob5VR2Gw1vmxNYGRYQQLXGdBwfG",
-    "CaseDriveID": "b!X6iuQPHK9UeDjBmivhpk-qwHqLT-ZEdLsCyhhob5VR0NRceFBlc5Q4xNWpGhJlzz"
+    "ClientId": "39c01bb7-7e2b-4e3c-a972-80d75d5840a1",
+    "ClientSecret": "smc6T7J+xtWbWdYotUbtSH1uLLkbDUen1M2FPRLitVw=",
+    "Host": "cloudmission.sharepoint.com",
+    "ContractDriveID": "b!9J86Bb25TkqOPhhWkFNzT06lEa1YTH5IgWLyoTlNRFyGHpPZiRy3Q6xeOghKD4xh",
+    "CaseDriveID": "b!9J86Bb25TkqOPhhWkFNzT06lEa1YTH5IgWLyoTlNRFyNExGhzoCsTopQXYpOJa9W"
   }
 }

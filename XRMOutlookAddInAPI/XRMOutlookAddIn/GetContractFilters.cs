@@ -33,7 +33,7 @@ namespace XRMOutlookAddIn
             string host = Environment.GetEnvironmentVariable("Host", EnvironmentVariableTarget.Process);
 
             //hardcoding of the url needs to be removed
-            string rel = new Uri("https://vssworks.sharepoint.com/sites/xrmtest").AbsolutePath;
+            string rel = new Uri("https://cloudmission.sharepoint.com/sites/xrm").AbsolutePath;
             string siteurl = "";
             siteurl = rel == "/" ? host : string.Format("{0}:{1}:", host, rel);
 
@@ -56,17 +56,17 @@ namespace XRMOutlookAddIn
                 JObject req1 = new JObject{
                 {"id","1"},
                 {"method","GET"},
-                {"url",string.Format("/sites/{0}/lists('Clients')/items?expand=fields(select=Client_x0020_Name)&select=id,fields",siteurl)}
+                {"url",string.Format("/sites/{0}/lists('Clients')/items?expand=fields(select=Title)&select=id,fields",siteurl)}
             };
                 JObject req2 = new JObject{
                 {"id","2"},
                 {"method","GET"},
-                {"url",string.Format("/sites/{0}/lists('Stakeholders')/items?expand=fields(select=Client_x0020_Name)&select=id,fields",siteurl)}
+                {"url",string.Format("/sites/{0}/lists('Stakeholders')/items?expand=fields(select=Title)&select=id,fields",siteurl)}
             };
                 JObject req3 = new JObject{
                 {"id","3"},
                 {"method","GET"},
-                {"url",string.Format("/sites/{0}/lists('Case Status')/items?expand=fields(select=Title)&select=id,fields",siteurl)}
+                {"url",string.Format("/sites/{0}/lists('Case Statuses')/items?expand=fields(select=Title)&select=id,fields",siteurl)}
             };
                 JArray a = new JArray();
                 a.Add(req1); a.Add(req2); a.Add(req3);
@@ -91,7 +91,7 @@ namespace XRMOutlookAddIn
                     {
                         foreach (var val in item.body.value)
                         {
-                            Clients.Add(string.Format("{0},{1}",val.fields.Client_x0020_Name, val.id));
+                            Clients.Add(string.Format("{0},{1}",val.fields.Title, val.id));
                         }
                     }else if (item.id == "3")
                     {
@@ -104,7 +104,7 @@ namespace XRMOutlookAddIn
                     {
                         foreach (var val in item.body.value)
                         {
-                            Stakeholders.Add(string.Format("{0},{1}", val.fields.Client_x0020_Name, val.id));
+                            Stakeholders.Add(string.Format("{0},{1}", val.fields.Title, val.id));
                         }
                     }
                 }

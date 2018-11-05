@@ -71,7 +71,7 @@ function getListItems(querydata) {
 
 function loadData() {
     //$('#run').click(run);
-    $.fn.selectpicker.Constructor.BootstrapVersion = '4';
+    //$.fn.selectpicker.Constructor.BootstrapVersion = '4';
     //Event handler for site collection dropdown
     $("#sitecollections").on("change", function (event) {
         var optionselected = $(this).find("option:selected");
@@ -164,7 +164,7 @@ function fetchConfigData() {
     $(".loader").css("display", "block");
     console.log("Fetching Config list data");
     $.ajax({
-        url: "https://xrmoutlookaddin.azurewebsites.net/api/GetXRMAddInConfiguration?code=nzUUuX1DObCOn5GTzvoLGR/nRDU6Pog08RY6jMHNvpBp/zz0dgd/DQ==",
+        url: "https://xrmaddin.azurewebsites.net/api/GetXRMAddInConfiguration?code=J31if945OIWZ0rfj0XeQqx21X5YgssotLb3jn36Ymrz5uJujk293Kg==",
         method: "Get",
         headers: { "Accept": "application/json;odata=verbose" },
         success: function (data) {
@@ -190,7 +190,7 @@ function fetchContractFilterData() {
     $(".loader").css("display", "block");
     console.log("Fetching Config list data");
     $.ajax({
-        url: "https://xrmoutlookaddin.azurewebsites.net/api/GetContractFilters?code=JwRjIrMznRj4r4XwPKb1ERaTX7rrjaz7qp/YUAyrj7K2PEr8129EMw==",
+        url: "https://xrmaddin.azurewebsites.net/api/GetContractFilters?code=LJKgrMqT85YzaKzHygaxH0pgDJ6FZfAciu3LH1IGwAsy2fPzKhj/PQ==",
         method: "Get",
         headers: { "Accept": "application/json;odata=verbose" },
         success: function (data) {
@@ -220,7 +220,7 @@ function fetchListItems(queryString) {
     $("#ddsaveemail").css("display", "block");
     $("#ddsaveattachments").css("display", "block");
     $.ajax({
-        url: "https://xrmoutlookaddin.azurewebsites.net/api/GetListItems?code=nL0I4H0QhnTBUU7fXOMrY4WB0oJ3tZc5TMk0mtBpxM168KGJUJthng==&" + queryString,
+        url: "https://xrmaddin.azurewebsites.net/api/GetListItems?code=JteNXQpGPk7iJ0SeVGmH6GhvbJUTOWkt0auau4Hwr9AzlYVqWR4YjA==&" + queryString,
         method: "Get",
         headers: { "Accept": "application/json;odata=verbose" },
         success: function (data) {
@@ -228,8 +228,8 @@ function fetchListItems(queryString) {
             $.each(data, (index, value) => {
                 $("#xrmitemsDD").append('<option value="' + value.ID + '">' + value.Title + '</option>')
             });
-            $('#xrmitemsDD').selectpicker();
-            $('#xrmitemsDD').addClass("selectpicker");
+            // $('#xrmitemsDD').selectpicker();
+            // $('#xrmitemsDD').addClass("selectpicker");
             $("#btnFetch").css("display", "none");
             $(".loader").css("display", "none");
         },
@@ -262,7 +262,7 @@ function getMailData(item) {
 function saveMailData(){
    console.log(JSON.stringify(mailitem));
     $.ajax({
-        url:"https://xrmoutlookaddin.azurewebsites.net/api/SaveItem?code=J//vdaiOH0Boxe0sMc54Bl2kCYgiHZaNqKi8Td7S20H0gMjeBsDZfA==",
+        url:"https://xrmaddin.azurewebsites.net/api/SaveItem?code=iaoCWzCEJY4IpvQFjviq2kCyo9zMUgKx7PyH08s2kpSTvwCm6zMmDg==",
         method:"POST",
         data:JSON.stringify(mailitem),
         headers:{ "Accept": "application/json;odata=verbose", "content-type": "application/json;odata=verbose" },
@@ -278,7 +278,7 @@ function saveMailData(){
 // Format an EmailAddressDetails object as
   // GivenName Surname <emailaddress>
   function buildEmailAddressString(address) {
-    return address.displayName + "," + address.emailAddress + ";";
+    return address.displayName + ":" + address.emailAddress + ";";
   }
   
   // Take an array of EmailAddressDetails objects and
@@ -317,7 +317,7 @@ function saveMailData(){
   function saveMailAttachments(data){
     console.log(JSON.stringify(data));
     $.ajax({
-        url:"https://xrmoutlookaddin.azurewebsites.net/api/SaveAttachments?code=LEPq9agv4sbGsxkBwissVEa4TraATCyoWvYG96n3FxCndQUXrMDGaQ==",
+        url:"https://xrmaddin.azurewebsites.net/api/SaveAttachments?code=dCUm7lSbOriEyaoXM/tvMeMEM0yd4hrBJf1LadoTgXxQ9t/h9kswog==",
         method:"POST",
         data:JSON.stringify(data),
         headers:{ "Accept": "application/json;odata=verbose", "content-type": "application/json;odata=verbose" },
