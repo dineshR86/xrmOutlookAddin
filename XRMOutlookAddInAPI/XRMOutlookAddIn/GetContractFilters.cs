@@ -11,24 +11,32 @@ using System.Net.Http;
 using System.Net.Http.Headers;
 using System.Text;
 using System.Threading.Tasks;
+using Newtonsoft.Json.Linq;
 
 
 namespace XRMOutlookAddIn
 {
     public static class GetContractFilters
     {
-        public static string resourceId = "https://graph.microsoft.com";
-        public static string tenantId = "70aa9dc9-726c-4d05-88f3-519ef4a1f1ac";
-        public static string authString = "https://login.microsoftonline.com/" + tenantId;
-        public static string upn = string.Empty;
-        public static string clientId = "001bf6ce-45f9-4af4-bd57-ec96ea220e21";
-        public static string clientSecret = "LnLN95vmqecwdaMv5AUq54g7uO3vMKjmvtJU5jlTAAo=";
         private static HttpClient _sharedHttpClient = new HttpClient();
 
         [FunctionName("GetContractFilters")]
         public static async Task<HttpResponseMessage> Run([HttpTrigger(AuthorizationLevel.Function, "get", Route = null)]HttpRequestMessage req, ILogger log)
         {
-            log.LogInformation("Function fetchuserdetails started");
+            log.LogInformation("Function GetContractFilters started");
+            //Getting the Application settings
+            string resourceId = Environment.GetEnvironmentVariable("ResourceId", EnvironmentVariableTarget.Process);
+            string tenantid = Environment.GetEnvironmentVariable("TenantId", EnvironmentVariableTarget.Process);
+            string authString = Environment.GetEnvironmentVariable("AuthString", EnvironmentVariableTarget.Process) + tenantid;
+            string clientId = Environment.GetEnvironmentVariable("ClientId", EnvironmentVariableTarget.Process);
+            string clientSecret = Environment.GetEnvironmentVariable("ClientSecret", EnvironmentVariableTarget.Process);
+            string host = Environment.GetEnvironmentVariable("Host", EnvironmentVariableTarget.Process);
+
+            //hardcoding of the url needs to be removed
+            string rel = new Uri("https://vssworks.sharepoint.com/sites/xrmtest").AbsolutePath;
+            string siteurl = "";
+            siteurl = rel == "/" ? host : string.Format("{0}:{1}:", host, rel);
+
             try
             {
                 var authenticationContext = new AuthenticationContext(authString, false);
@@ -45,11 +53,31 @@ namespace XRMOutlookAddIn
                 string requestUrl = "https://graph.microsoft.com/v1.0/$batch";
                 log.LogInformation(string.Format("About to hit Graph endpoint: '{0}'.", requestUrl));
 
-                string body = "{\"requests\": [{\"url\": \"/sites/root/lists('Clients')/items?expand=fields(select=ClientName)&select=id,fields\",\"method\": \"GET\",\"id\": \"1\"},{\"url\": \"/sites/root/lists('Stakeholders')/items?expand=fields(select=StakeholderName)&select=id,fields\",\"method\": \"GET\",\"id\": \"2\"},{\"url\": \"/sites/root/lists('Status')/items?expand=fields(select=Title)&select=id,fields\",\"method\": \"GET\",\"id\": \"3\"}]}";
+                JObject req1 = new JObject{
+                {"id","1"},
+                {"method","GET"},
+                {"url",string.Format("/sites/{0}/lists('Clients')/items?expand=fields(select=Client_x0020_Name)&select=id,fields",siteurl)}
+            };
+                JObject req2 = new JObject{
+                {"id","2"},
+                {"method","GET"},
+                {"url",string.Format("/sites/{0}/lists('Stakeholders')/items?expand=fields(select=Client_x0020_Name)&select=id,fields",siteurl)}
+            };
+                JObject req3 = new JObject{
+                {"id","3"},
+                {"method","GET"},
+                {"url",string.Format("/sites/{0}/lists('Case Status')/items?expand=fields(select=Title)&select=id,fields",siteurl)}
+            };
+                JArray a = new JArray();
+                a.Add(req1); a.Add(req2); a.Add(req3);
+
+                JObject o = new JObject();
+                o["requests"] = a;
+                
                 HttpRequestMessage requestMsg = new HttpRequestMessage(new HttpMethod("POST"), requestUrl);
                 requestMsg.Headers.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
                 requestMsg.Headers.Authorization = new AuthenticationHeaderValue("Bearer", token);
-                requestMsg.Content = new StringContent(body, Encoding.UTF8, "application/json");
+                requestMsg.Content = new StringContent(o.ToString(), Encoding.UTF8, "application/json");
 
                 HttpResponseMessage response = _sharedHttpClient.SendAsync(requestMsg).Result;
                 var content = await response.Content.ReadAsStringAsync();
@@ -63,7 +91,7 @@ namespace XRMOutlookAddIn
                     {
                         foreach (var val in item.body.value)
                         {
-                            Clients.Add(string.Format("{0},{1}",val.fields.ClientName,val.id));
+                            Clients.Add(string.Format("{0},{1}",val.fields.Client_x0020_Name, val.id));
                         }
                     }else if (item.id == "3")
                     {
@@ -76,7 +104,7 @@ namespace XRMOutlookAddIn
                     {
                         foreach (var val in item.body.value)
                         {
-                            Stakeholders.Add(string.Format("{0},{1}", val.fields.StakeholderName, val.id));
+                            Stakeholders.Add(string.Format("{0},{1}", val.fields.Client_x0020_Name, val.id));
                         }
                     }
                 }

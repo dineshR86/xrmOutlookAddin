@@ -1,7 +1,15 @@
 {
-    "IsEncrypted": false,
-    "Values": {
-        "AzureWebJobsStorage": "UseDevelopmentStorage=true",
-        "FUNCTIONS_WORKER_RUNTIME": "dotnet"
-    }
+  "IsEncrypted": false,
+  "Values": {
+    "AzureWebJobsStorage": "UseDevelopmentStorage=true",
+    "FUNCTIONS_WORKER_RUNTIME": "dotnet",
+    "ResourceId": "https://graph.microsoft.com",
+    "TenantId": "de38a5e5-3518-4123-8e94-8f7f2a6f7250",
+    "AuthString": "https://login.microsoftonline.com/",
+    "ClientId": "60d69ebd-0b0a-4370-b7ce-8e869d2cf428",
+    "ClientSecret": "E2OFXFH+jIKI/MUEz13P+x5JTOeadSz48b0NCWoSTyA=",
+    "Host": "vssworks.sharepoint.com",
+    "ContractDriveID": "b!X6iuQPHK9UeDjBmivhpk-qwHqLT-ZEdLsCyhhob5VR2Gw1vmxNYGRYQQLXGdBwfG",
+    "CaseDriveID": "b!X6iuQPHK9UeDjBmivhpk-qwHqLT-ZEdLsCyhhob5VR0NRceFBlc5Q4xNWpGhJlzz"
+  }
 }
