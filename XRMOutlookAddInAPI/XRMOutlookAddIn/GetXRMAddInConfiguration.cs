@@ -1,22 +1,16 @@
 
-using System;
-using System.IO;
-using System.Threading.Tasks;
-using Microsoft.AspNetCore.Mvc;
 using Microsoft.Azure.WebJobs;
 using Microsoft.Azure.WebJobs.Extensions.Http;
-using Microsoft.AspNetCore.Http;
-using Microsoft.Azure.WebJobs.Host;
 using Microsoft.Extensions.Logging;
-using Newtonsoft.Json;
 using Microsoft.IdentityModel.Clients.ActiveDirectory;
+using Newtonsoft.Json;
+using System;
+using System.Collections.Generic;
 using System.Net;
 using System.Net.Http;
 using System.Net.Http.Headers;
-using System.Reflection;
-using System.Collections;
-using System.Collections.Generic;
 using System.Text;
+using System.Threading.Tasks;
 
 namespace XRMOutlookAddIn
 {

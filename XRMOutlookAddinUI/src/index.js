@@ -182,7 +182,9 @@ function fetchConfigData() {
             });
             $(".loader").css("display", "none");
         },
-        error: function (data) { console.log(data); }
+        error: function (data) { 
+            $("#afailure").text(data).css("display","block");
+         }
     });
 }
 
