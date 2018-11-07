@@ -2,8 +2,11 @@
  * Copyright (c) Microsoft Corporation. All rights reserved. Licensed under the MIT license.
  * See LICENSE in the project root for license information.
  */
-//import 'bootstrap';
+// import 'jquery';
+//  import 'bootstrap';
 //import 'bootstrap-select';
+
+
 
 var queryobj = {
     sitecollection: "",
@@ -29,6 +32,9 @@ var mailitem = {
     sitecollectionUrl:"",
     listname:""
 }
+
+var hosturl="https://xrmoutlookaddin.azurewebsites.net/api/";
+var securecode="DL8XWGougr5eizgk/6qXzPy7O3sI4j31hpIVOk7a5SujVSYwLx/QZA==";
 
 // $(document).ready(function () {
 //     fetchConfigData();
@@ -164,7 +170,7 @@ function fetchConfigData() {
     $(".loader").css("display", "block");
     console.log("Fetching Config list data");
     $.ajax({
-        url: "https://xrmaddin.azurewebsites.net/api/GetXRMAddInConfiguration?code=J31if945OIWZ0rfj0XeQqx21X5YgssotLb3jn36Ymrz5uJujk293Kg==",
+        url: hosturl+"GetXRMAddInConfiguration?code="+securecode,
         method: "Get",
         headers: { "Accept": "application/json;odata=verbose" },
         success: function (data) {
@@ -181,9 +187,11 @@ function fetchConfigData() {
                 $("#projectstatus").append('<option value="' + value + '">' + value + '</option>')
             });
             $(".loader").css("display", "none");
+            //$("#asuccess").text(data).css("display","block");
         },
         error: function (data) { 
-            $("#afailure").text(data).css("display","block");
+            console.log(data);
+            $("#afailure").text(data.statusText).css("display","block");
          }
     });
 }
@@ -192,7 +200,7 @@ function fetchContractFilterData() {
     $(".loader").css("display", "block");
     console.log("Fetching Config list data");
     $.ajax({
-        url: "https://xrmaddin.azurewebsites.net/api/GetContractFilters?code=LJKgrMqT85YzaKzHygaxH0pgDJ6FZfAciu3LH1IGwAsy2fPzKhj/PQ==",
+        url: hosturl+"GetContractFilters?code="+securecode,
         method: "Get",
         headers: { "Accept": "application/json;odata=verbose" },
         success: function (data) {
@@ -222,7 +230,7 @@ function fetchListItems(queryString) {
     $("#ddsaveemail").css("display", "block");
     $("#ddsaveattachments").css("display", "block");
     $.ajax({
-        url: "https://xrmaddin.azurewebsites.net/api/GetListItems?code=JteNXQpGPk7iJ0SeVGmH6GhvbJUTOWkt0auau4Hwr9AzlYVqWR4YjA==&" + queryString,
+        url: hosturl+"GetListItems?code="+securecode+"&" + queryString,
         method: "Get",
         headers: { "Accept": "application/json;odata=verbose" },
         success: function (data) {
@@ -264,7 +272,7 @@ function getMailData(item) {
 function saveMailData(){
    console.log(JSON.stringify(mailitem));
     $.ajax({
-        url:"https://xrmaddin.azurewebsites.net/api/SaveItem?code=iaoCWzCEJY4IpvQFjviq2kCyo9zMUgKx7PyH08s2kpSTvwCm6zMmDg==",
+        url:hosturl+"SaveItem?code="+securecode,
         method:"POST",
         data:JSON.stringify(mailitem),
         headers:{ "Accept": "application/json;odata=verbose", "content-type": "application/json;odata=verbose" },
@@ -319,7 +327,7 @@ function saveMailData(){
   function saveMailAttachments(data){
     console.log(JSON.stringify(data));
     $.ajax({
-        url:"https://xrmaddin.azurewebsites.net/api/SaveAttachments?code=dCUm7lSbOriEyaoXM/tvMeMEM0yd4hrBJf1LadoTgXxQ9t/h9kswog==",
+        url:hosturl+"SaveAttachments?code="+securecode,
         method:"POST",
         data:JSON.stringify(data),
         headers:{ "Accept": "application/json;odata=verbose", "content-type": "application/json;odata=verbose" },
