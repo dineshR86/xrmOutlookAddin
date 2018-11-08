@@ -38,7 +38,6 @@ var securecode="DL8XWGougr5eizgk/6qXzPy7O3sI4j31hpIVOk7a5SujVSYwLx/QZA==";
 
 // $(document).ready(function () {
 //     fetchConfigData();
-//    fetchContractFilterData();
 //    loadData();
 //     //getMailData(Office.context.mailbox.item);
 // });
@@ -48,9 +47,7 @@ Office.initialize = (reason) => {
     //when you browse the page outside outlook load the document.ready outside the this method.
     $(document).ready(function () {
        fetchConfigData();
-    fetchContractFilterData();
-    loadData();
-    //getMailAttachments(Office.context.mailbox.item);
+       loadData();
     });
 };
 
@@ -87,6 +84,7 @@ function loadData() {
             $("#lists").css("display", "block");
             queryobj.sitecollection = optionselected.val();
             mailitem.sitecollectionUrl=optionselected.val();
+            fetchContractFilterData();
         }
         $(this).attr("disabled", "disabled");
         //console.log(optionselected.text());
@@ -168,7 +166,7 @@ function loadData() {
 
 function fetchConfigData() {
     $(".loader").css("display", "block");
-    console.log("Fetching Config list data");
+    //console.log("Fetching Config list data");
     $.ajax({
         url: hosturl+"GetXRMAddInConfiguration?code="+securecode,
         method: "Get",
@@ -191,16 +189,17 @@ function fetchConfigData() {
         },
         error: function (data) { 
             console.log(data);
-            $("#afailure").text(data.statusText).css("display","block");
+            $("#afailure").text(data.statusText+":"+data.responseJSON.summary).css("display","block");
+            $(".loader").css("display", "none");
          }
     });
 }
 
 function fetchContractFilterData() {
     $(".loader").css("display", "block");
-    console.log("Fetching Config list data");
+    //console.log("Fetching Config list data");
     $.ajax({
-        url: hosturl+"GetContractFilters?code="+securecode,
+        url: hosturl+"GetContractFilters?code="+securecode+"&sc="+$("#sitecollections").find("option:selected").val(),
         method: "Get",
         headers: { "Accept": "application/json;odata=verbose" },
         success: function (data) {
@@ -220,13 +219,17 @@ function fetchContractFilterData() {
             });
             $(".loader").css("display", "none");
         },
-        error: function (data) { console.log(data); }
+        error: function (data) { 
+            console.log(data); 
+            $("#afailure").text(data.statusText+":"+data.responseText).css("display","block");
+            $(".loader").css("display", "none");
+        }
     });
 }
 
 function fetchListItems(queryString) {
     $(".loader").css("display", "block");
-    console.log("Fetching list item data");
+    //console.log("Fetching list item data");
     $("#ddsaveemail").css("display", "block");
     $("#ddsaveattachments").css("display", "block");
     $.ajax({
@@ -243,7 +246,11 @@ function fetchListItems(queryString) {
             $("#btnFetch").css("display", "none");
             $(".loader").css("display", "none");
         },
-        error: function (data) { console.log(data); }
+        error: function (data) { 
+            console.log(data); 
+            $("#afailure").text(data.statusText+":"+data.responseText).css("display","block");
+            $(".loader").css("display", "none");
+        }
     });
 }
 
@@ -264,13 +271,13 @@ function getMailData(item) {
             saveMailData();
         }
     });
-    console.log(mailitem);
+    //console.log(mailitem);
     
     $(".loader").css("display", "none");
 }
 
 function saveMailData(){
-   console.log(JSON.stringify(mailitem));
+   //console.log(JSON.stringify(mailitem));
     $.ajax({
         url:hosturl+"SaveItem?code="+securecode,
         method:"POST",
@@ -278,9 +285,15 @@ function saveMailData(){
         headers:{ "Accept": "application/json;odata=verbose", "content-type": "application/json;odata=verbose" },
         success:function(data){
             console.log(data);
+            var msg= $("#asuccess").text();
+            $("#asuccess").text(msg+"<br/>"+data.summary).css("display","block");
+            //https://docs.microsoft.com/en-in/javascript/api/office/office.ui?product=outlook&view=office-js#closeContainer
+            Office.context.ui.closeContainer();
+            $("#savesection").css("display","none");
         },
         error:function(error){
             console.log(error);
+            $("#afailure").text(error.summary).css("display","block");
         }
     })
 }
@@ -325,7 +338,7 @@ function saveMailData(){
   }
 
   function saveMailAttachments(data){
-    console.log(JSON.stringify(data));
+    //console.log(JSON.stringify(data));
     $.ajax({
         url:hosturl+"SaveAttachments?code="+securecode,
         method:"POST",
@@ -333,9 +346,12 @@ function saveMailData(){
         headers:{ "Accept": "application/json;odata=verbose", "content-type": "application/json;odata=verbose" },
         success:function(data){
             console.log(data);
+            var msg= $("#asuccess").text();
+            $("#asuccess").text(msg+"<br/>"+data.summary).css("display","block");
         },
         error:function(error){
             console.log(error);
+            $("#afailure").text(error.summary).css("display","block");
         }
     });
   }
