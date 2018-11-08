@@ -33,8 +33,8 @@ var mailitem = {
     listname:""
 }
 
-var hosturl="https://xrmoutlookaddin.azurewebsites.net/api/";
-var securecode="DL8XWGougr5eizgk/6qXzPy7O3sI4j31hpIVOk7a5SujVSYwLx/QZA==";
+var hosturl="https://xrmaddin.azurewebsites.net/api/";
+var securecode="yXSBa1SLBbAvC7p7HIsLZ/R5PwZNwEOapWimJHma8eui5jBtHyL26w==";
 
 // $(document).ready(function () {
 //     fetchConfigData();
@@ -128,10 +128,10 @@ function loadData() {
             queryobj.filterfield = "Status";
         } else if (parentselect[0].id == "relatedClient") {
             queryobj.clientfilter = optionselected.val();
-            queryobj.clientfield = "Client_x0020_Contract_x0020_PartLookupId";
+            queryobj.clientfield = "ClientContractPartyLookupId";
         } else if (parentselect[0].id == "relatedStakeholder") {
             queryobj.stakeholderfilter = optionselected.val();
-            queryobj.stakeholderfield = "Stakeholder_x0020_Contract_x0020LookupId";
+            queryobj.stakeholderfield = "StakeholderContractPartyLookupId";
         }
 
         $("#btnFetch").css("display", "block");
@@ -286,7 +286,7 @@ function saveMailData(){
         success:function(data){
             console.log(data);
             var msg= $("#asuccess").text();
-            $("#asuccess").text(msg+"<br/>"+data.responseJSON.summary).css("display","block");
+            $("#asuccess").text(msg+"<br/>"+data.summary).css("display","block");
             //https://docs.microsoft.com/en-in/javascript/api/office/office.ui?product=outlook&view=office-js#closeContainer
             Office.context.ui.closeContainer();
             $("#savesection").css("display","none");
@@ -347,7 +347,7 @@ function saveMailData(){
         success:function(data){
             console.log(data);
             var msg= $("#asuccess").text();
-            $("#asuccess").text(msg+"<br/>"+data.responseJSON.summary).css("display","block");
+            $("#asuccess").text(msg+"<br/>"+data.summary).css("display","block");
         },
         error:function(error){
             console.log(error);
