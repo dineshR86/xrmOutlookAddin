@@ -12,6 +12,7 @@ using System.Net.Http.Headers;
 using System.Text;
 using System.Threading.Tasks;
 using Newtonsoft.Json.Linq;
+using Microsoft.AspNetCore.Http;
 
 
 namespace XRMOutlookAddIn
@@ -21,7 +22,7 @@ namespace XRMOutlookAddIn
         private static HttpClient _sharedHttpClient = new HttpClient();
 
         [FunctionName("GetContractFilters")]
-        public static async Task<HttpResponseMessage> Run([HttpTrigger(AuthorizationLevel.Function, "get", Route = null)]HttpRequestMessage req, ILogger log)
+        public static async Task<HttpResponseMessage> Run([HttpTrigger(AuthorizationLevel.Function, "get", Route = null)]HttpRequest req, ILogger log)
         {
             log.LogInformation("Function GetContractFilters started");
             //Getting the Application settings
@@ -32,8 +33,8 @@ namespace XRMOutlookAddIn
             string clientSecret = Environment.GetEnvironmentVariable("ClientSecret", EnvironmentVariableTarget.Process);
             string host = Environment.GetEnvironmentVariable("Host", EnvironmentVariableTarget.Process);
 
-            //hardcoding of the url needs to be removed
-            string rel = new Uri("https://cloudmission.sharepoint.com/sites/xrm").AbsolutePath;
+            string sitecollectionUrl = req.Query["sc"];
+            string rel = new Uri(sitecollectionUrl).AbsolutePath;
             string siteurl = "";
             siteurl = rel == "/" ? host : string.Format("{0}:{1}:", host, rel);
 
@@ -80,6 +81,7 @@ namespace XRMOutlookAddIn
                 requestMsg.Content = new StringContent(o.ToString(), Encoding.UTF8, "application/json");
 
                 HttpResponseMessage response = _sharedHttpClient.SendAsync(requestMsg).Result;
+                if (response.IsSuccessStatusCode) { 
                 var content = await response.Content.ReadAsStringAsync();
                 dynamic items = JsonConvert.DeserializeObject<RootObject>(content);
                 List<string> Clients = new List<string>();
@@ -114,11 +116,16 @@ namespace XRMOutlookAddIn
                 filterdata.Stakeholders = Stakeholders;
                 filterdata.Status = Status;
                 return new HttpResponseMessage(HttpStatusCode.OK) { Content = new StringContent(JsonConvert.SerializeObject(filterdata, Formatting.Indented), Encoding.UTF8, "application/json") };
+                }
+                else
+                {
+                    throw new Exception("Error while fetching the Filter values. Please contact the administrator.");
+                }
             }
             catch (Exception ex)
             {
                 log.LogError(string.Format("Exception! '{0}'.", ex));
-                return req.CreateResponse(HttpStatusCode.InternalServerError, new { summary = "Error" });
+                return new HttpResponseMessage(HttpStatusCode.InternalServerError) { Content = new StringContent(ex.Message) };
             }
         }
     }

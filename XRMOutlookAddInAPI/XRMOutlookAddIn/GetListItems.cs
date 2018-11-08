@@ -17,7 +17,7 @@ namespace XRMOutlookAddIn
 {
     public static class GetListItems
     {
-        
+
         private static HttpClient _sharedHttpClient = new HttpClient();
 
         [FunctionName("GetListItems")]
@@ -51,9 +51,10 @@ namespace XRMOutlookAddIn
                 string requestUrl = "";
                 if (!string.IsNullOrEmpty(fieldname1))
                 {
-                    requestUrl = string.Format("https://graph.microsoft.com/v1.0/sites/{0}/lists/{1}/items?expand=fields(select=Title,{2})&filter=fields/{2} eq '{3}'and fields/{4} eq '{5}'&select=id,fields", siteurl, listname, fieldname, fieldvalue,fieldname1,fieldvalue1);
+                    requestUrl = string.Format("https://graph.microsoft.com/v1.0/sites/{0}/lists/{1}/items?expand=fields(select=Title,{2})&filter=fields/{2} eq '{3}'and fields/{4} eq '{5}'&select=id,fields", siteurl, listname, fieldname, fieldvalue, fieldname1, fieldvalue1);
                 }
-                else {
+                else
+                {
                     requestUrl = string.Format("https://graph.microsoft.com/v1.0/sites/{0}/lists/{1}/items?expand=fields(select=Title,{2})&filter=fields/{2} eq '{3}'&select=id,fields", siteurl, listname, fieldname, fieldvalue);
                 }
 
@@ -68,30 +69,33 @@ namespace XRMOutlookAddIn
                     log.LogInformation("successfully obtained access token");
                 }
 
-
-                log.LogInformation(string.Format("About to hit Graph endpoint: '{0}'.", requestUrl));
-
                 HttpRequestMessage requestMsg = new HttpRequestMessage(new HttpMethod("GET"), requestUrl);
                 requestMsg.Headers.Authorization = new AuthenticationHeaderValue("Bearer", token);
-
                 HttpResponseMessage response = _sharedHttpClient.SendAsync(requestMsg).Result;
-                var content = await response.Content.ReadAsStringAsync();
-                dynamic items = JsonConvert.DeserializeObject<RootValue>(content);
-                List<ItemData> datas = new List<ItemData>();
-                foreach (var item in items.value)
+                if (response.IsSuccessStatusCode)
                 {
-                    ItemData data = new ItemData();
-                    data.ID = item.id;
-                    data.Title = item.fields.Title;
-                    datas.Add(data);
-                }
+                    var content = await response.Content.ReadAsStringAsync();
+                    dynamic items = JsonConvert.DeserializeObject<RootValue>(content);
+                    List<ItemData> datas = new List<ItemData>();
+                    foreach (var item in items.value)
+                    {
+                        ItemData data = new ItemData();
+                        data.ID = item.id;
+                        data.Title = item.fields.Title;
+                        datas.Add(data);
+                    }
 
-                return new HttpResponseMessage(HttpStatusCode.OK) { Content = new StringContent(JsonConvert.SerializeObject(datas, Formatting.Indented), Encoding.UTF8, "application/json") };
+                    return new HttpResponseMessage(HttpStatusCode.OK) { Content = new StringContent(JsonConvert.SerializeObject(datas, Formatting.Indented), Encoding.UTF8, "application/json") };
+                }
+                else
+                {
+                    throw new Exception("Error while fetching the list items. Please contact the administrator.");
+                }
             }
             catch (Exception ex)
             {
                 log.LogError(string.Format("Exception! '{0}'.", ex));
-                return new HttpResponseMessage(HttpStatusCode.InternalServerError) { Content = new StringContent("Error") };
+                return new HttpResponseMessage(HttpStatusCode.InternalServerError) { Content = new StringContent(ex.Message) };
             }
         }
     }

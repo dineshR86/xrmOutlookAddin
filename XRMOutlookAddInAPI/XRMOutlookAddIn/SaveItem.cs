@@ -22,11 +22,11 @@ namespace XRMOutlookAddIn
     public static class SaveItem
     {
         private static HttpClient _sharedHttpClient = new HttpClient();
-        
+
 
         [FunctionName("SaveItem")]
         public static async Task<HttpResponseMessage> Run([HttpTrigger(AuthorizationLevel.Function, "post", Route = null)] HttpRequestMessage req, ILogger log)
-        {   
+        {
             log.LogInformation("C# HTTP trigger function processed a request.");
             //Getting the Application settings
             string resourceId = Environment.GetEnvironmentVariable("ResourceId", EnvironmentVariableTarget.Process);
@@ -74,9 +74,15 @@ namespace XRMOutlookAddIn
                 requestMsg.Headers.Authorization = new AuthenticationHeaderValue("Bearer", token);
                 requestMsg.Content = new StringContent(posdata, Encoding.UTF8, "application/json");
                 HttpResponseMessage response = _sharedHttpClient.SendAsync(requestMsg).Result;
-                var content = await response.Content.ReadAsStringAsync();
-
-                return new HttpResponseMessage(HttpStatusCode.OK) { Content = new StringContent(content) };
+                if (response.IsSuccessStatusCode)
+                {
+                    var content = await response.Content.ReadAsStringAsync();
+                    return req.CreateResponse(HttpStatusCode.OK, new { summary = "Mail was saved successfully." });
+                }
+                else
+                {
+                    throw new Exception("Error while saving the item. Please contact the administrator.");
+                }
             }
             catch (Exception ex)
             {

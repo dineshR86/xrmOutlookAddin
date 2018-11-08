@@ -42,12 +42,11 @@ namespace XRMOutlookAddIn
                 }
 
                 string requestUrl = "https://graph.microsoft.com/v1.0/sites/root/lists('XRMAddinConfiguration')/items?expand=fields(select=ConfigKey,ConfigValue)";
-                log.LogInformation(string.Format("About to hit Graph endpoint: '{0}'.", requestUrl));
 
                 HttpRequestMessage requestMsg = new HttpRequestMessage(new HttpMethod("GET"), requestUrl);
                 requestMsg.Headers.Authorization = new AuthenticationHeaderValue("Bearer", token);
-
                 HttpResponseMessage response = _sharedHttpClient.SendAsync(requestMsg).Result;
+                if (response.IsSuccessStatusCode) { 
                 var content =  await response.Content.ReadAsStringAsync();
                 dynamic items = JsonConvert.DeserializeObject<RootValue>(content);
                 ConfigData config = new ConfigData();
@@ -72,11 +71,17 @@ namespace XRMOutlookAddIn
                     }
                 }
                 return new HttpResponseMessage(HttpStatusCode.OK) { Content = new StringContent(JsonConvert.SerializeObject(config,Formatting.Indented),Encoding.UTF8,"application/json")};
+                }
+                else
+                {
+                    throw new Exception("Error while fetching the XRMConfiguration. Please contact the administrator.");
+                }
             }
             catch (Exception ex)
             {
                 log.LogError(string.Format("Exception! '{0}'.", ex));
-                return req.CreateResponse(HttpStatusCode.InternalServerError, new { summary = "Error" });
+                return req.CreateResponse(HttpStatusCode.InternalServerError, new { summary = ex.Message });
+                //return new HttpResponseMessage(HttpStatusCode.InternalServerError) { Content = new StringContent(ex.Message) };
             }
 
         }
