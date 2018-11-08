@@ -286,14 +286,14 @@ function saveMailData(){
         success:function(data){
             console.log(data);
             var msg= $("#asuccess").text();
-            $("#asuccess").text(msg+"<br/>"+data.summary).css("display","block");
+            $("#asuccess").text(msg+"<br/>"+data.responseJSON.summary).css("display","block");
             //https://docs.microsoft.com/en-in/javascript/api/office/office.ui?product=outlook&view=office-js#closeContainer
             Office.context.ui.closeContainer();
             $("#savesection").css("display","none");
         },
         error:function(error){
             console.log(error);
-            $("#afailure").text(error.summary).css("display","block");
+            $("#afailure").text(error.statusText+":"+error.responseJSON.summary).css("display","block");
         }
     })
 }
@@ -347,11 +347,11 @@ function saveMailData(){
         success:function(data){
             console.log(data);
             var msg= $("#asuccess").text();
-            $("#asuccess").text(msg+"<br/>"+data.summary).css("display","block");
+            $("#asuccess").text(msg+"<br/>"+data.responseJSON.summary).css("display","block");
         },
         error:function(error){
             console.log(error);
-            $("#afailure").text(error.summary).css("display","block");
+            $("#afailure").text(error.statusText+":"+error.responseJSON.summary).css("display","block");
         }
     });
   }
