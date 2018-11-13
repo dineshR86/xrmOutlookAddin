@@ -9,16 +9,15 @@
   <!-- Begin Basic Settings: Add-in metadata, used for all versions of Office unless override provided. -->
 
   <!-- IMPORTANT! Id must be unique for your add-in, if you reuse this manifest ensure that you change this id to a new GUID. -->
-  <Id>4383b8e6-e1ec-4a91-b70e-aff8de72334d</Id>
+  <Id>dbc2690a-7fd6-4114-b12e-b5e4b38f90a3</Id>
 
   <!--Version. Updates from the store only get triggered if there is a version change. -->
   <Version>1.0.0.0</Version>
-  <ProviderName>Dinesh Rayudu</ProviderName>
+  <ProviderName>Cloud Mission</ProviderName>
   <DefaultLocale>en-US</DefaultLocale>
   <!-- The display name of your add-in. Used on the store and various places of the Office UI such as the add-ins dialog. -->
-  <DisplayName DefaultValue="XRMOUtlookAddinUIJquery" />
+  <DisplayName DefaultValue="XRMOUtlookAddin" />
   <Description DefaultValue="Addin for XRMOutlook"/>
-
   <!-- Icon for your add-in. Used on installation screens and the add-ins dialog. -->
   <IconUrl DefaultValue="https://localhost:3000/assets/icon-32.png" />
   <HighResolutionIconUrl DefaultValue="https://localhost:3000/assets/hi-res-icon.png"/>
