@@ -1,6 +1,8 @@
 
 using Microsoft.Azure.WebJobs;
 using Microsoft.Azure.WebJobs.Extensions.Http;
+using Microsoft.Azure.KeyVault;
+using Microsoft.Azure.Services.AppAuthentication;
 using Microsoft.Extensions.Logging;
 using Microsoft.IdentityModel.Clients.ActiveDirectory;
 using Newtonsoft.Json;
@@ -17,6 +19,9 @@ namespace XRMOutlookAddIn
     public static class GetXRMAddInConfiguration
     {   
         private static HttpClient _sharedHttpClient = new HttpClient();
+        public static string ClientId = string.Empty;
+        public static string ClientSecret = string.Empty;
+        public static string TenantId = string.Empty;
 
         [FunctionName("GetXRMAddInConfiguration")]
         public static async Task<HttpResponseMessage> Run([HttpTrigger(AuthorizationLevel.Function, "get", Route = null)]HttpRequestMessage req, ILogger log)
@@ -24,12 +29,21 @@ namespace XRMOutlookAddIn
             log.LogInformation("C# HTTP trigger function processed a request.");
             try
             {   
+                //hardcoding the domain which will be removed. Need to get the domain as part of the email.
+                var domain = "OaktonDiData";
+                var azureServiceTokenProvider = new AzureServiceTokenProvider();
+                var keyVaultClient = new KeyVaultClient(new KeyVaultClient.AuthenticationCallback(azureServiceTokenProvider.KeyVaultTokenCallback));
+                var keyVaultName = "xrmaddinkeyvault";
+                ClientId= (await keyVaultClient.GetSecretAsync($"https://{keyVaultName}.vault.azure.net/secrets/{domain+"ClientId"}")).Value;
+                ClientSecret = (await keyVaultClient.GetSecretAsync($"https://{keyVaultName}.vault.azure.net/secrets/{domain + "ClientSecret"}")).Value;
+                TenantId= (await keyVaultClient.GetSecretAsync($"https://{keyVaultName}.vault.azure.net/secrets/{domain + "TenantId"}")).Value;
+
                 //Getting the Application settings
                 string resourceId = Environment.GetEnvironmentVariable("ResourceId", EnvironmentVariableTarget.Process);
-                string tenantid=Environment.GetEnvironmentVariable("TenantId", EnvironmentVariableTarget.Process);
+                string tenantid = TenantId;
                 string authString = Environment.GetEnvironmentVariable("AuthString", EnvironmentVariableTarget.Process) + tenantid;
-                string clientId= Environment.GetEnvironmentVariable("ClientId", EnvironmentVariableTarget.Process);
-                string clientSecret= Environment.GetEnvironmentVariable("ClientSecret", EnvironmentVariableTarget.Process);
+                string clientId = ClientId;
+                string clientSecret = ClientSecret;
 
                 var authenticationContext = new AuthenticationContext(authString, false);
                 ClientCredential clientCred = new ClientCredential(clientId, clientSecret);
