@@ -9,7 +9,7 @@
     "ClientId": "39c01bb7-7e2b-4e3c-a972-80d75d5840a1",
     "ClientSecret": "smc6T7J+xtWbWdYotUbtSH1uLLkbDUen1M2FPRLitVw=",
     "Host": "cloudmission.sharepoint.com",
-    "ContractDriveID": "b!9J86Bb25TkqOPhhWkFNzT06lEa1YTH5IgWLyoTlNRFyGHpPZiRy3Q6xeOghKD4xh",
-    "CaseDriveID": "b!9J86Bb25TkqOPhhWkFNzT06lEa1YTH5IgWLyoTlNRFyNExGhzoCsTopQXYpOJa9W"
+    "ContractDriveName": "Contracts",
+    "CaseDriveName": "XRMCasesLibrary"
   }
 }
