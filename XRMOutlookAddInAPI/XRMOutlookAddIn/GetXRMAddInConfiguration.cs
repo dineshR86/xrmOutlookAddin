@@ -34,12 +34,13 @@ namespace XRMOutlookAddIn
                 //hardcoding the domain which will be removed. Need to get the domain as part of the email.
                 var domain = req.Query["domain"];
                 Host = $"{domain}.sharepoint.com";
-                var keyVaultName = Environment.GetEnvironmentVariable("ResourceId", EnvironmentVariableTarget.Process);
+                var keyVaultName = Environment.GetEnvironmentVariable("KeyVaultName", EnvironmentVariableTarget.Process);
                 var azureServiceTokenProvider = new AzureServiceTokenProvider();
                 var keyVaultClient = new KeyVaultClient(new KeyVaultClient.AuthenticationCallback(azureServiceTokenProvider.KeyVaultTokenCallback));
-                ClientId= (await keyVaultClient.GetSecretAsync($"https://{keyVaultName}.vault.azure.net/secrets/{domain+"ClientId"}")).Value;
-                ClientSecret = (await keyVaultClient.GetSecretAsync($"https://{keyVaultName}.vault.azure.net/secrets/{domain + "ClientSecret"}")).Value;
-                TenantId= (await keyVaultClient.GetSecretAsync($"https://{keyVaultName}.vault.azure.net/secrets/{domain + "TenantId"}")).Value;
+                string connection= (await keyVaultClient.GetSecretAsync($"https://{keyVaultName}.vault.azure.net/secrets/{domain + "Connection"}")).Value;
+                ClientId = connection.Split(';')[1];
+                ClientSecret = connection.Split(';')[2];
+                TenantId = connection.Split(';')[0];
 
                 //Getting the Application settings
                 string resourceId = Environment.GetEnvironmentVariable("ResourceId", EnvironmentVariableTarget.Process);
