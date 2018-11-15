@@ -13,6 +13,7 @@ using System.Net.Http;
 using System.Net.Http.Headers;
 using System.Text;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Http;
 
 namespace XRMOutlookAddIn
 {
@@ -22,31 +23,30 @@ namespace XRMOutlookAddIn
         public static string ClientId = string.Empty;
         public static string ClientSecret = string.Empty;
         public static string TenantId = string.Empty;
+        public static string Host = string.Empty;
 
         [FunctionName("GetXRMAddInConfiguration")]
-        public static async Task<HttpResponseMessage> Run([HttpTrigger(AuthorizationLevel.Function, "get", Route = null)]HttpRequestMessage req, ILogger log)
+        public static async Task<HttpResponseMessage> Run([HttpTrigger(AuthorizationLevel.Function, "get", Route = null)]HttpRequest req, ILogger log)
         {
             log.LogInformation("C# HTTP trigger function processed a request.");
             try
             {   
                 //hardcoding the domain which will be removed. Need to get the domain as part of the email.
-                var domain = "OaktonDiData";
+                var domain = req.Query["domain"];
+                Host = $"{domain}.sharepoint.com";
+                var keyVaultName = Environment.GetEnvironmentVariable("ResourceId", EnvironmentVariableTarget.Process);
                 var azureServiceTokenProvider = new AzureServiceTokenProvider();
                 var keyVaultClient = new KeyVaultClient(new KeyVaultClient.AuthenticationCallback(azureServiceTokenProvider.KeyVaultTokenCallback));
-                var keyVaultName = "xrmaddinkeyvault";
                 ClientId= (await keyVaultClient.GetSecretAsync($"https://{keyVaultName}.vault.azure.net/secrets/{domain+"ClientId"}")).Value;
                 ClientSecret = (await keyVaultClient.GetSecretAsync($"https://{keyVaultName}.vault.azure.net/secrets/{domain + "ClientSecret"}")).Value;
                 TenantId= (await keyVaultClient.GetSecretAsync($"https://{keyVaultName}.vault.azure.net/secrets/{domain + "TenantId"}")).Value;
 
                 //Getting the Application settings
                 string resourceId = Environment.GetEnvironmentVariable("ResourceId", EnvironmentVariableTarget.Process);
-                string tenantid = TenantId;
-                string authString = Environment.GetEnvironmentVariable("AuthString", EnvironmentVariableTarget.Process) + tenantid;
-                string clientId = ClientId;
-                string clientSecret = ClientSecret;
+                string authString = Environment.GetEnvironmentVariable("AuthString", EnvironmentVariableTarget.Process) + TenantId;
 
                 var authenticationContext = new AuthenticationContext(authString, false);
-                ClientCredential clientCred = new ClientCredential(clientId, clientSecret);
+                ClientCredential clientCred = new ClientCredential(ClientId, ClientSecret);
                 AuthenticationResult authenticationResult = await authenticationContext.AcquireTokenAsync(resourceId, clientCred);
                 string token = authenticationResult.AccessToken;
 
@@ -94,8 +94,8 @@ namespace XRMOutlookAddIn
             catch (Exception ex)
             {
                 log.LogError(string.Format("Exception! '{0}'.", ex));
-                return req.CreateResponse(HttpStatusCode.InternalServerError, new { summary = ex.Message });
-                //return new HttpResponseMessage(HttpStatusCode.InternalServerError) { Content = new StringContent(ex.Message) };
+                //return req.CreateResponse(HttpStatusCode.InternalServerError, new { summary = ex.Message });
+                return new HttpResponseMessage(HttpStatusCode.InternalServerError) { Content = new StringContent(ex.Message) };
             }
 
         }

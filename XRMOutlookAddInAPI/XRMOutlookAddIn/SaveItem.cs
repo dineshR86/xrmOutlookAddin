@@ -34,7 +34,7 @@ namespace XRMOutlookAddIn
             string authString = Environment.GetEnvironmentVariable("AuthString", EnvironmentVariableTarget.Process) + tenantid;
             string clientId = GetXRMAddInConfiguration.ClientId;
             string clientSecret = GetXRMAddInConfiguration.ClientSecret;
-            string host = Environment.GetEnvironmentVariable("Host", EnvironmentVariableTarget.Process);
+            string host = GetXRMAddInConfiguration.Host;
             try
             {
                 GetData fields = await req.Content.ReadAsAsync<GetData>();

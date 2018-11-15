@@ -31,8 +31,8 @@ namespace XRMOutlookAddIn
             string authString = Environment.GetEnvironmentVariable("AuthString", EnvironmentVariableTarget.Process) + tenantid;
             string clientId = GetXRMAddInConfiguration.ClientId;
             string clientSecret = GetXRMAddInConfiguration.ClientSecret;
-            string host = Environment.GetEnvironmentVariable("Host", EnvironmentVariableTarget.Process);
-
+            string host = GetXRMAddInConfiguration.Host;
+            
             string sitecollectionUrl = req.Query["sc"];
             string rel = new Uri(sitecollectionUrl).AbsolutePath;
             string siteurl = "";

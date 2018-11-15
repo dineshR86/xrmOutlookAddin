@@ -31,7 +31,7 @@ namespace XRMOutlookAddIn
             string clientSecret = GetXRMAddInConfiguration.ClientSecret;
             string ContractDriveName = Environment.GetEnvironmentVariable("ContractDriveName", EnvironmentVariableTarget.Process);
             string CaseDriveName = Environment.GetEnvironmentVariable("CaseDriveName", EnvironmentVariableTarget.Process);
-            string host = Environment.GetEnvironmentVariable("Host", EnvironmentVariableTarget.Process);
+            string host = GetXRMAddInConfiguration.Host;
 
             try
             {

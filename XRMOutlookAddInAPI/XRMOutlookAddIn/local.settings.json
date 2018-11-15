@@ -4,11 +4,8 @@
     "AzureWebJobsStorage": "UseDevelopmentStorage=true",
     "FUNCTIONS_WORKER_RUNTIME": "dotnet",
     "ResourceId": "https://graph.microsoft.com",
-    "TenantId": "d3d8e52c-b3c6-4d7a-9857-34c82389369c",
     "AuthString": "https://login.microsoftonline.com/",
-    "ClientId": "39c01bb7-7e2b-4e3c-a972-80d75d5840a1",
-    "ClientSecret": "smc6T7J+xtWbWdYotUbtSH1uLLkbDUen1M2FPRLitVw=",
-    "Host": "cloudmission.sharepoint.com",
+    "KeyVaultName": "xrmaddinkeyvault",
     "ContractDriveName": "Contracts",
     "CaseDriveName": "XRMCasesLibrary"
   }
