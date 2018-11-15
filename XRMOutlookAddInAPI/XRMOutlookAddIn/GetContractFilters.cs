@@ -27,12 +27,12 @@ namespace XRMOutlookAddIn
             log.LogInformation("Function GetContractFilters started");
             //Getting the Application settings
             string resourceId = Environment.GetEnvironmentVariable("ResourceId", EnvironmentVariableTarget.Process);
-            string tenantid = Environment.GetEnvironmentVariable("TenantId", EnvironmentVariableTarget.Process);
+            string tenantid = GetXRMAddInConfiguration.TenantId;
             string authString = Environment.GetEnvironmentVariable("AuthString", EnvironmentVariableTarget.Process) + tenantid;
-            string clientId = Environment.GetEnvironmentVariable("ClientId", EnvironmentVariableTarget.Process);
-            string clientSecret = Environment.GetEnvironmentVariable("ClientSecret", EnvironmentVariableTarget.Process);
-            string host = Environment.GetEnvironmentVariable("Host", EnvironmentVariableTarget.Process);
-
+            string clientId = GetXRMAddInConfiguration.ClientId;
+            string clientSecret = GetXRMAddInConfiguration.ClientSecret;
+            string host = GetXRMAddInConfiguration.Host;
+            
             string sitecollectionUrl = req.Query["sc"];
             string rel = new Uri(sitecollectionUrl).AbsolutePath;
             string siteurl = "";
@@ -67,7 +67,7 @@ namespace XRMOutlookAddIn
                 JObject req3 = new JObject{
                 {"id","3"},
                 {"method","GET"},
-                {"url",string.Format("/sites/{0}/lists('Case Statuses')/items?expand=fields(select=Title)&select=id,fields",siteurl)}
+                {"url",string.Format("/sites/{0}/lists('Case Status')/items?expand=fields(select=Title)&select=id,fields",siteurl)}
             };
                 JArray a = new JArray();
                 a.Add(req1); a.Add(req2); a.Add(req3);

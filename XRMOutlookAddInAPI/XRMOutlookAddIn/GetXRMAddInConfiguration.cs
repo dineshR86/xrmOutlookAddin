@@ -1,6 +1,8 @@
 
 using Microsoft.Azure.WebJobs;
 using Microsoft.Azure.WebJobs.Extensions.Http;
+using Microsoft.Azure.KeyVault;
+using Microsoft.Azure.Services.AppAuthentication;
 using Microsoft.Extensions.Logging;
 using Microsoft.IdentityModel.Clients.ActiveDirectory;
 using Newtonsoft.Json;
@@ -11,28 +13,41 @@ using System.Net.Http;
 using System.Net.Http.Headers;
 using System.Text;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Http;
 
 namespace XRMOutlookAddIn
 {
     public static class GetXRMAddInConfiguration
     {   
         private static HttpClient _sharedHttpClient = new HttpClient();
+        public static string ClientId = string.Empty;
+        public static string ClientSecret = string.Empty;
+        public static string TenantId = string.Empty;
+        public static string Host = string.Empty;
 
         [FunctionName("GetXRMAddInConfiguration")]
-        public static async Task<HttpResponseMessage> Run([HttpTrigger(AuthorizationLevel.Function, "get", Route = null)]HttpRequestMessage req, ILogger log)
+        public static async Task<HttpResponseMessage> Run([HttpTrigger(AuthorizationLevel.Function, "get", Route = null)]HttpRequest req, ILogger log)
         {
             log.LogInformation("C# HTTP trigger function processed a request.");
             try
             {   
+                //hardcoding the domain which will be removed. Need to get the domain as part of the email.
+                var domain = req.Query["domain"];
+                Host = $"{domain}.sharepoint.com";
+                var keyVaultName = Environment.GetEnvironmentVariable("KeyVaultName", EnvironmentVariableTarget.Process);
+                var azureServiceTokenProvider = new AzureServiceTokenProvider();
+                var keyVaultClient = new KeyVaultClient(new KeyVaultClient.AuthenticationCallback(azureServiceTokenProvider.KeyVaultTokenCallback));
+                string connection= (await keyVaultClient.GetSecretAsync($"https://{keyVaultName}.vault.azure.net/secrets/{domain + "Connection"}")).Value;
+                ClientId = connection.Split(';')[1];
+                ClientSecret = connection.Split(';')[2];
+                TenantId = connection.Split(';')[0];
+
                 //Getting the Application settings
                 string resourceId = Environment.GetEnvironmentVariable("ResourceId", EnvironmentVariableTarget.Process);
-                string tenantid=Environment.GetEnvironmentVariable("TenantId", EnvironmentVariableTarget.Process);
-                string authString = Environment.GetEnvironmentVariable("AuthString", EnvironmentVariableTarget.Process) + tenantid;
-                string clientId= Environment.GetEnvironmentVariable("ClientId", EnvironmentVariableTarget.Process);
-                string clientSecret= Environment.GetEnvironmentVariable("ClientSecret", EnvironmentVariableTarget.Process);
+                string authString = Environment.GetEnvironmentVariable("AuthString", EnvironmentVariableTarget.Process) + TenantId;
 
                 var authenticationContext = new AuthenticationContext(authString, false);
-                ClientCredential clientCred = new ClientCredential(clientId, clientSecret);
+                ClientCredential clientCred = new ClientCredential(ClientId, ClientSecret);
                 AuthenticationResult authenticationResult = await authenticationContext.AcquireTokenAsync(resourceId, clientCred);
                 string token = authenticationResult.AccessToken;
 
@@ -80,8 +95,8 @@ namespace XRMOutlookAddIn
             catch (Exception ex)
             {
                 log.LogError(string.Format("Exception! '{0}'.", ex));
-                return req.CreateResponse(HttpStatusCode.InternalServerError, new { summary = ex.Message });
-                //return new HttpResponseMessage(HttpStatusCode.InternalServerError) { Content = new StringContent(ex.Message) };
+                //return req.CreateResponse(HttpStatusCode.InternalServerError, new { summary = ex.Message });
+                return new HttpResponseMessage(HttpStatusCode.InternalServerError) { Content = new StringContent(ex.Message) };
             }
 
         }

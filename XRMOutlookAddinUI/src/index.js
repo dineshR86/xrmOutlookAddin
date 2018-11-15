@@ -33,23 +33,23 @@ var mailitem = {
     listname:""
 }
 
-var hosturl="https://xrmaddin.azurewebsites.net/api/";
-var securecode="yXSBa1SLBbAvC7p7HIsLZ/R5PwZNwEOapWimJHma8eui5jBtHyL26w==";
+var hosturl="https://xrmoutlookaddin.azurewebsites.net/api/";
+var securecode="DL8XWGougr5eizgk/6qXzPy7O3sI4j31hpIVOk7a5SujVSYwLx/QZA==";
 
-// $(document).ready(function () {
-//     fetchConfigData();
-//    loadData();
-//     //getMailData(Office.context.mailbox.item);
-// });
+$(document).ready(function () {
+    fetchConfigData();
+   loadData();
+    //getMailData(Office.context.mailbox.item);
+});
 
 //The initialize function must be run each time a new page is loaded
-Office.initialize = (reason) => {
-    //when you browse the page outside outlook load the document.ready outside the this method.
-    $(document).ready(function () {
-       fetchConfigData();
-       loadData();
-    });
-};
+// Office.initialize = (reason) => {
+//     //when you browse the page outside outlook load the document.ready outside the this method.
+//     $(document).ready(function () {
+//        fetchConfigData();
+//        loadData();
+//     });
+// };
 
 
 function getListItems(querydata) {
@@ -140,6 +140,8 @@ function loadData() {
     // event handler for fetch
     $("#btnFetch").click(function (event) {
         $("#xrmitems").css("display", "block");
+        $("#xrmitemsDD").empty();
+        $("#xrmitemsDD").append('<option value="">-selected-</option>');
         getListItems(queryobj);
     });
 
@@ -166,9 +168,10 @@ function loadData() {
 
 function fetchConfigData() {
     $(".loader").css("display", "block");
+    var domain=$("#domain").val();
     //console.log("Fetching Config list data");
     $.ajax({
-        url: hosturl+"GetXRMAddInConfiguration?code="+securecode,
+        url: hosturl+"GetXRMAddInConfiguration?domain="+domain+"&code="+securecode,
         method: "Get",
         headers: { "Accept": "application/json;odata=verbose" },
         success: function (data) {
@@ -239,7 +242,7 @@ function fetchListItems(queryString) {
         success: function (data) {
             console.log(data);
             $.each(data, (index, value) => {
-                $("#xrmitemsDD").append('<option value="' + value.ID + '">' + value.Title + '</option>')
+                $("#xrmitemsDD").append('<option value="' + value.ID + '">' + value.Title + '</option>');
             });
             // $('#xrmitemsDD').selectpicker();
             // $('#xrmitemsDD').addClass("selectpicker");
