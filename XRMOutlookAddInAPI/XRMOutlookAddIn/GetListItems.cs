@@ -1,10 +1,11 @@
-
-using Microsoft.AspNetCore.Http;
+using Microsoft.Azure.KeyVault;
+using Microsoft.Azure.Services.AppAuthentication;
 using Microsoft.Azure.WebJobs;
 using Microsoft.Azure.WebJobs.Extensions.Http;
 using Microsoft.Extensions.Logging;
 using Microsoft.IdentityModel.Clients.ActiveDirectory;
 using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
 using System;
 using System.Collections.Generic;
 using System.Net;
@@ -21,25 +22,31 @@ namespace XRMOutlookAddIn
         private static HttpClient _sharedHttpClient = new HttpClient();
 
         [FunctionName("GetListItems")]
-        public static async Task<HttpResponseMessage> Run([HttpTrigger(AuthorizationLevel.Function, "get", Route = null)]HttpRequest req, ILogger log)
+        public static async Task<HttpResponseMessage> Run([HttpTrigger(AuthorizationLevel.Function, "post", Route = null)]HttpRequestMessage req, ILogger log)
         {
             log.LogInformation("C# HTTP trigger function for fetching list items");
 
-            //Getting the Application settings
-            string resourceId = Environment.GetEnvironmentVariable("ResourceId", EnvironmentVariableTarget.Process);
-            string tenantid = GetXRMAddInConfiguration.TenantId;
-            string authString = Environment.GetEnvironmentVariable("AuthString", EnvironmentVariableTarget.Process) + tenantid;
-            string clientId = GetXRMAddInConfiguration.ClientId;
-            string clientSecret = GetXRMAddInConfiguration.ClientSecret;
-            string host = GetXRMAddInConfiguration.Host;
-
+            var reqObj = JObject.Parse(await req.Content.ReadAsStringAsync());
             //string sitecollection = req.GetQueryNameValuePairs().FirstOrDefault(q => string.Compare(q.Key, "name", true) == 0).Value;
-            string sitecollection = req.Query["sc"];
-            string listname = req.Query["list"];
-            string fieldname = req.Query["ff"];
-            string fieldvalue = req.Query["val"];
-            string fieldname1 = req.Query["ff1"];
-            string fieldvalue1 = req.Query["val1"];
+            string sitecollection = reqObj.GetValue("sc").ToString();
+            string listname = reqObj.GetValue("list").ToString();
+            string fieldname = reqObj.GetValue("ff").ToString();
+            string fieldvalue = reqObj.GetValue("val").ToString();
+            string fieldname1 = reqObj.GetValue("ff1").ToString();
+            string fieldvalue1 = reqObj.GetValue("val1").ToString();
+            string domain= reqObj.GetValue("domain").ToString();
+
+            //Getting the Application settings
+            var keyVaultName = Environment.GetEnvironmentVariable("KeyVaultName", EnvironmentVariableTarget.Process);
+            var azureServiceTokenProvider = new AzureServiceTokenProvider();
+            var keyVaultClient = new KeyVaultClient(new KeyVaultClient.AuthenticationCallback(azureServiceTokenProvider.KeyVaultTokenCallback));
+            string connection = (await keyVaultClient.GetSecretAsync($"https://{keyVaultName}.vault.azure.net/secrets/{domain + "Connection"}")).Value;
+            string resourceId = Environment.GetEnvironmentVariable("ResourceId", EnvironmentVariableTarget.Process);
+            string tenantid = connection.Split(';')[0];
+            string authString = Environment.GetEnvironmentVariable("AuthString", EnvironmentVariableTarget.Process) + tenantid;
+            string clientId = connection.Split(';')[1];
+            string clientSecret = connection.Split(';')[2];
+            string host = $"{domain}.sharepoint.com";
 
 
             try
@@ -49,7 +56,7 @@ namespace XRMOutlookAddIn
                 // sample graph api call with filter https://graph.microsoft.com/v1.0/sites/oaktondidata.sharepoint.com/lists('XRMCases')/items?expand=fields(select=Title,StatusLookupId)&filter=fields/StatusLookupId eq '3'
                 siteurl = rel == "/" ? host : string.Format("{0}:{1}:", host, rel);
                 string requestUrl = "";
-                if (!string.IsNullOrEmpty(fieldname1))
+                if (!string.IsNullOrEmpty(fieldname1) && !string.IsNullOrEmpty(fieldvalue1))
                 {
                     requestUrl = string.Format("https://graph.microsoft.com/v1.0/sites/{0}/lists/{1}/items?expand=fields(select=Title,{2})&filter=fields/{2} eq '{3}'and fields/{4} eq '{5}'&select=id,fields", siteurl, listname, fieldname, fieldvalue, fieldname1, fieldvalue1);
                 }

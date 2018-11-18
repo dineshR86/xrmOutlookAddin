@@ -1,21 +1,16 @@
-using System;
-using System.IO;
-using System.Threading.Tasks;
-using Microsoft.AspNetCore.Mvc;
+using Microsoft.Azure.KeyVault;
+using Microsoft.Azure.Services.AppAuthentication;
 using Microsoft.Azure.WebJobs;
 using Microsoft.Azure.WebJobs.Extensions.Http;
-using Microsoft.AspNetCore.Http;
-using Microsoft.Azure.WebJobs.Host;
 using Microsoft.Extensions.Logging;
-using Newtonsoft.Json;
 using Microsoft.IdentityModel.Clients.ActiveDirectory;
+using Newtonsoft.Json;
+using System;
 using System.Net;
 using System.Net.Http;
 using System.Net.Http.Headers;
-using System.Reflection;
-using System.Collections;
-using System.Collections.Generic;
 using System.Text;
+using System.Threading.Tasks;
 
 namespace XRMOutlookAddIn
 {
@@ -28,16 +23,22 @@ namespace XRMOutlookAddIn
         public static async Task<HttpResponseMessage> Run([HttpTrigger(AuthorizationLevel.Function, "post", Route = null)] HttpRequestMessage req, ILogger log)
         {
             log.LogInformation("C# HTTP trigger function processed a request.");
+            GetData fields = await req.Content.ReadAsAsync<GetData>();
+            string domain = fields.domain;
             //Getting the Application settings
+            var keyVaultName = Environment.GetEnvironmentVariable("KeyVaultName", EnvironmentVariableTarget.Process);
+            var azureServiceTokenProvider = new AzureServiceTokenProvider();
+            var keyVaultClient = new KeyVaultClient(new KeyVaultClient.AuthenticationCallback(azureServiceTokenProvider.KeyVaultTokenCallback));
+            string connection = (await keyVaultClient.GetSecretAsync($"https://{keyVaultName}.vault.azure.net/secrets/{domain + "Connection"}")).Value;
             string resourceId = Environment.GetEnvironmentVariable("ResourceId", EnvironmentVariableTarget.Process);
-            string tenantid = GetXRMAddInConfiguration.TenantId;
+            string tenantid = connection.Split(';')[0];
             string authString = Environment.GetEnvironmentVariable("AuthString", EnvironmentVariableTarget.Process) + tenantid;
-            string clientId = GetXRMAddInConfiguration.ClientId;
-            string clientSecret = GetXRMAddInConfiguration.ClientSecret;
-            string host = GetXRMAddInConfiguration.Host;
+            string clientId = connection.Split(';')[1];
+            string clientSecret = connection.Split(';')[2];
+            string host = $"{domain}.sharepoint.com";
+
             try
             {
-                GetData fields = await req.Content.ReadAsAsync<GetData>();
                 MailData postFields = new MailData()
                 {
                     Subject = fields.Subject,
@@ -130,6 +131,7 @@ namespace XRMOutlookAddIn
         public string listid { get; set; }
         public string sitecollectionUrl { get; set; }
         public string listname { get; set; }
+        public string domain { get; set; }
     }
 
     internal class PostData

@@ -1,3 +1,5 @@
+using Microsoft.Azure.KeyVault;
+using Microsoft.Azure.Services.AppAuthentication;
 using Microsoft.Azure.WebJobs;
 using Microsoft.Azure.WebJobs.Extensions.Http;
 using Microsoft.Extensions.Logging;
@@ -23,19 +25,25 @@ namespace XRMOutlookAddIn
         public static async Task<HttpResponseMessage> Run([HttpTrigger(AuthorizationLevel.Function, "post", Route = null)] HttpRequestMessage req, ILogger log)
         {
             log.LogInformation("C# HTTP trigger function processed a request.");
+            AttachmentProps props = await req.Content.ReadAsAsync<AttachmentProps>();
+            string domain = props.domain;
             //Getting the Application settings
+            var keyVaultName = Environment.GetEnvironmentVariable("KeyVaultName", EnvironmentVariableTarget.Process);
+            var azureServiceTokenProvider = new AzureServiceTokenProvider();
+            var keyVaultClient = new KeyVaultClient(new KeyVaultClient.AuthenticationCallback(azureServiceTokenProvider.KeyVaultTokenCallback));
+            string connection = (await keyVaultClient.GetSecretAsync($"https://{keyVaultName}.vault.azure.net/secrets/{domain + "Connection"}")).Value;
             string resourceId = Environment.GetEnvironmentVariable("ResourceId", EnvironmentVariableTarget.Process);
-            string tenantid = GetXRMAddInConfiguration.TenantId;
+            string tenantid = connection.Split(';')[0];
             string authString = Environment.GetEnvironmentVariable("AuthString", EnvironmentVariableTarget.Process) + tenantid;
-            string clientId = GetXRMAddInConfiguration.ClientId;
-            string clientSecret = GetXRMAddInConfiguration.ClientSecret;
             string ContractDriveName = Environment.GetEnvironmentVariable("ContractDriveName", EnvironmentVariableTarget.Process);
             string CaseDriveName = Environment.GetEnvironmentVariable("CaseDriveName", EnvironmentVariableTarget.Process);
-            string host = GetXRMAddInConfiguration.Host;
+            string clientId = connection.Split(';')[1];
+            string clientSecret = connection.Split(';')[2];
+            string host = $"{domain}.sharepoint.com";
 
             try
             {
-                AttachmentProps props = await req.Content.ReadAsAsync<AttachmentProps>();
+                
                 string rel = new Uri(props.sitecollectionUrl).AbsolutePath;
                 string siteurl = "";
                 siteurl = rel == "/" ? host : string.Format("{0}:{1}", host, rel);
@@ -213,14 +221,12 @@ namespace XRMOutlookAddIn
     internal class AttachmentProps
     {
         public string MessageId { get; set; }
-
         public string UserId { get; set; }
-
         public string ItemTitle { get; set; }
-
         public string ItemID { get; set; }
         public string ListName { get; set; }
         public string sitecollectionUrl { get; set; }
+        public string domain { get; set; }
     }
 
     internal class Attachment

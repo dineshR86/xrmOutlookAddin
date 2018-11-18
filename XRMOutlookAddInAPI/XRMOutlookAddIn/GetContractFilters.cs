@@ -1,9 +1,12 @@
 
+using Microsoft.Azure.KeyVault;
+using Microsoft.Azure.Services.AppAuthentication;
 using Microsoft.Azure.WebJobs;
 using Microsoft.Azure.WebJobs.Extensions.Http;
 using Microsoft.Extensions.Logging;
 using Microsoft.IdentityModel.Clients.ActiveDirectory;
 using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
 using System;
 using System.Collections.Generic;
 using System.Net;
@@ -11,8 +14,6 @@ using System.Net.Http;
 using System.Net.Http.Headers;
 using System.Text;
 using System.Threading.Tasks;
-using Newtonsoft.Json.Linq;
-using Microsoft.AspNetCore.Http;
 
 
 namespace XRMOutlookAddIn
@@ -22,18 +23,25 @@ namespace XRMOutlookAddIn
         private static HttpClient _sharedHttpClient = new HttpClient();
 
         [FunctionName("GetContractFilters")]
-        public static async Task<HttpResponseMessage> Run([HttpTrigger(AuthorizationLevel.Function, "get", Route = null)]HttpRequest req, ILogger log)
+        public static async Task<HttpResponseMessage> Run([HttpTrigger(AuthorizationLevel.Function, "post", Route = null)]HttpRequestMessage req, ILogger log)
         {
             log.LogInformation("Function GetContractFilters started");
+            var reqObj = JObject.Parse(await req.Content.ReadAsStringAsync());
+            string sitecollectionUrl = reqObj.GetValue("sc").ToString();
+            string domain= reqObj.GetValue("domain").ToString();
             //Getting the Application settings
+            var keyVaultName = Environment.GetEnvironmentVariable("KeyVaultName", EnvironmentVariableTarget.Process);
+            var azureServiceTokenProvider = new AzureServiceTokenProvider();
+            var keyVaultClient = new KeyVaultClient(new KeyVaultClient.AuthenticationCallback(azureServiceTokenProvider.KeyVaultTokenCallback));
+            string connection = (await keyVaultClient.GetSecretAsync($"https://{keyVaultName}.vault.azure.net/secrets/{domain + "Connection"}")).Value;
             string resourceId = Environment.GetEnvironmentVariable("ResourceId", EnvironmentVariableTarget.Process);
-            string tenantid = GetXRMAddInConfiguration.TenantId;
+            string tenantid = connection.Split(';')[0];
             string authString = Environment.GetEnvironmentVariable("AuthString", EnvironmentVariableTarget.Process) + tenantid;
-            string clientId = GetXRMAddInConfiguration.ClientId;
-            string clientSecret = GetXRMAddInConfiguration.ClientSecret;
-            string host = GetXRMAddInConfiguration.Host;
-            
-            string sitecollectionUrl = req.Query["sc"];
+            string clientId = connection.Split(';')[1];
+            string clientSecret = connection.Split(';')[2];
+            string host = $"{domain}.sharepoint.com";
+
+
             string rel = new Uri(sitecollectionUrl).AbsolutePath;
             string siteurl = "";
             siteurl = rel == "/" ? host : string.Format("{0}:{1}:", host, rel);
