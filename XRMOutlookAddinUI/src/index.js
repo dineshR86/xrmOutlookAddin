@@ -36,34 +36,61 @@ var mailitem = {
 var hosturl="https://xrmoutlookaddin.azurewebsites.net/api/";
 var securecode="DL8XWGougr5eizgk/6qXzPy7O3sI4j31hpIVOk7a5SujVSYwLx/QZA==";
 
-$(document).ready(function () {
-    fetchConfigData();
-   loadData();
-    //getMailData(Office.context.mailbox.item);
-});
+// $(document).ready(function () {
+//     fetchConfigData();
+//    loadData();
+//     //getMailData(Office.context.mailbox.item);
+// });
 
 //The initialize function must be run each time a new page is loaded
-// Office.initialize = (reason) => {
-//     //when you browse the page outside outlook load the document.ready outside the this method.
-//     $(document).ready(function () {
-//        fetchConfigData();
-//        loadData();
-//     });
-// };
+Office.initialize = (reason) => {
+    //when you browse the page outside outlook load the document.ready outside the this method.
+    $(document).ready(function () {
+       fetchConfigData();
+       loadData();
+    });
+};
 
 
 function getListItems(querydata) {
 
-    var querystring = "";
-    if (querydata.clientfield.length > 0 && querydata.stakeholderfield.length > 0) {
-        querystring = "sc=" + querydata.sitecollection + "&list=" + querydata.list + "&ff=" + querydata.clientfield + "&val=" + querydata.clientfilter + "&ff1=" + querydata.stakeholderfield + "&val1=" + querydata.stakeholderfilter;
-    } else if (querydata.clientfield.length > 0) {
-        querystring = "sc=" + querydata.sitecollection + "&list=" + querydata.list + "&ff=" + querydata.clientfield + "&val=" + querydata.clientfilter;
-    } else if (querydata.stakeholderfield.length > 0) {
-        querystring = "sc=" + querydata.sitecollection + "&list=" + querydata.list + "&ff=" + querydata.stakeholderfield + "&val=" + querydata.stakeholderfilter;
+    var querystring = {
+        domain:$("#domain").val()
+    };
+
+    if (querydata.clientfield.length > 0 && querydata.stakeholderfield.length > 0 && querydata.clientfilter.length >0 && querydata.stakeholderfilter.length >0) {
+        //querystring = "sc=" + querydata.sitecollection + "&list=" + querydata.list + "&ff=" + querydata.clientfield + "&val=" + querydata.clientfilter + "&ff1=" + querydata.stakeholderfield + "&val1=" + querydata.stakeholderfilter;
+        querystring.sc=querydata.sitecollection;
+        querystring.list=querydata.list;
+        querystring.ff=querydata.clientfield;
+        querystring.val=querydata.clientfilter;
+        querystring.ff1=querydata.stakeholderfield;
+        querystring.val1=querydata.stakeholderfilter;
+    } else if (querydata.clientfield.length > 0 && querydata.clientfilter.length >0) {
+        //querystring = "sc=" + querydata.sitecollection + "&list=" + querydata.list + "&ff=" + querydata.clientfield + "&val=" + querydata.clientfilter;
+        querystring.sc=querydata.sitecollection;
+        querystring.list=querydata.list;
+        querystring.ff=querydata.clientfield;
+        querystring.val=querydata.clientfilter;
+        querystring.ff1="";
+        querystring.val1="";
+    } else if (querydata.stakeholderfield.length > 0 && querydata.stakeholderfilter.length >0) {
+        //querystring = "sc=" + querydata.sitecollection + "&list=" + querydata.list + "&ff=" + querydata.stakeholderfield + "&val=" + querydata.stakeholderfilter;
+        querystring.sc=querydata.sitecollection;
+        querystring.list=querydata.list;
+        querystring.ff=querydata.stakeholderfield;
+        querystring.val=querydata.stakeholderfilter;
+        querystring.ff1="";
+        querystring.val1="";
     }
     else {
-        querystring = "sc=" + querydata.sitecollection + "&list=" + querydata.list + "&ff=" + querydata.filterfield + "&val=" + querydata.statusfilter;
+        //querystring = "sc=" + querydata.sitecollection + "&list=" + querydata.list + "&ff=" + querydata.filterfield + "&val=" + querydata.statusfilter;
+        querystring.sc=querydata.sitecollection;
+        querystring.list=querydata.list;
+        querystring.ff=querydata.filterfield;
+        querystring.val=querydata.statusfilter;
+        querystring.ff1="";
+        querystring.val1="";
     }
 
     console.log(querystring);
@@ -128,10 +155,10 @@ function loadData() {
             queryobj.filterfield = "Status";
         } else if (parentselect[0].id == "relatedClient") {
             queryobj.clientfilter = optionselected.val();
-            queryobj.clientfield = "ClientContractPartyLookupId";
+            queryobj.clientfield = "Client_x0020_Contract_x0020_PartLookupId";
         } else if (parentselect[0].id == "relatedStakeholder") {
             queryobj.stakeholderfilter = optionselected.val();
-            queryobj.stakeholderfield = "StakeholderContractPartyLookupId";
+            queryobj.stakeholderfield = "Stakeholder_x0020_Contract_x0020LookupId";
         }
 
         $("#btnFetch").css("display", "block");
@@ -201,10 +228,16 @@ function fetchConfigData() {
 function fetchContractFilterData() {
     $(".loader").css("display", "block");
     //console.log("Fetching Config list data");
+    var reqdata={
+        sc:$("#sitecollections").find("option:selected").val(),
+        domain:$("#domain").val()
+    }
+
     $.ajax({
-        url: hosturl+"GetContractFilters?code="+securecode+"&sc="+$("#sitecollections").find("option:selected").val(),
-        method: "Get",
-        headers: { "Accept": "application/json;odata=verbose" },
+        url: hosturl+"GetContractFilters?code="+securecode,
+        method: "POST",
+        data:JSON.stringify(reqdata),
+        headers: { "Accept": "application/json;odata=verbose", "content-type": "application/json;odata=verbose" },
         success: function (data) {
             $.each(data.Clients, (index, value) => {
                 var clientoptions = value.split(",");
@@ -237,8 +270,9 @@ function fetchListItems(queryString) {
     $("#ddsaveattachments").css("display", "block");
     $.ajax({
         url: hosturl+"GetListItems?code="+securecode+"&" + queryString,
-        method: "Get",
-        headers: { "Accept": "application/json;odata=verbose" },
+        method: "POST",
+        data:JSON.stringify(queryString),
+        headers: { "Accept": "application/json;odata=verbose", "content-type": "application/json;odata=verbose" },
         success: function (data) {
             console.log(data);
             $.each(data, (index, value) => {
@@ -260,6 +294,7 @@ function fetchListItems(queryString) {
 function getMailData(item) {
     $(".loader").css("display", "block");
     // //Office.context.mailbox.item.to.getAsync(getToAddress);
+    mailitem.domain=$("#domain").val();
     mailitem.Subject = item.subject;
     mailitem.ConversationTopic=item.subject;
     mailitem.From = buildEmailAddressString(item.from);
@@ -280,7 +315,7 @@ function getMailData(item) {
 }
 
 function saveMailData(){
-   //console.log(JSON.stringify(mailitem));
+   console.log(JSON.stringify(mailitem));
     $.ajax({
         url:hosturl+"SaveItem?code="+securecode,
         method:"POST",
@@ -334,7 +369,8 @@ function saveMailData(){
         ItemTitle: $("#xrmitemsDD").find("option:selected").text(),
         ItemID:$("#xrmitemsDD").find("option:selected").val(),
         ListName:$("#listsdd").find("option:selected").val(),
-        sitecollectionUrl:$("#sitecollections").find("option:selected").val()
+        sitecollectionUrl:$("#sitecollections").find("option:selected").val(),
+        domain:$("#domain").val()
     }
 
     saveMailAttachments(attachdata);
