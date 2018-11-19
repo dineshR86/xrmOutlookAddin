@@ -67,7 +67,7 @@ namespace XRMOutlookAddIn
                 JObject req3 = new JObject{
                 {"id","3"},
                 {"method","GET"},
-                {"url",string.Format("/sites/{0}/lists('Case Status')/items?expand=fields(select=Title)&select=id,fields",siteurl)}
+                {"url",string.Format("/sites/{0}/lists('Case Statuses')/items?expand=fields(select=Title)&select=id,fields",siteurl)}
             };
                 JArray a = new JArray();
                 a.Add(req1); a.Add(req2); a.Add(req3);
