@@ -3,7 +3,7 @@
           xmlns="http://schemas.microsoft.com/office/appforoffice/1.1"
           xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
           xmlns:bt="http://schemas.microsoft.com/office/officeappbasictypes/1.0"
-          xmlns:mailappor="http://schemas.microsoft.com/office/mailappversionoverrides/1.0"
+          xmlns:mailappor="http://schemas.microsoft.com/office/mailappversionoverrides"
           xsi:type="MailApp">
 
   <!-- Begin Basic Settings: Add-in metadata, used for all versions of Office unless override provided. -->
@@ -19,20 +19,9 @@
   <DisplayName DefaultValue="XRMOUtlookAddin" />
   <Description DefaultValue="Addin for XRMOutlook"/>
   <!-- Icon for your add-in. Used on installation screens and the add-ins dialog. -->
-  <IconUrl DefaultValue="https://localhost:3000/assets/icon-32.png" />
-  <HighResolutionIconUrl DefaultValue="https://localhost:3000/assets/hi-res-icon.png"/>
-
-  <!--If you plan to submit this add-in to the Office Store, uncomment the SupportUrl element below-->
-  <SupportUrl DefaultValue="https://localhost:3000" />
-
-  <!-- Domains that will be allowed when navigating. For example, if you use ShowTaskpane and then have an href link, navigation will only be allowed if the domain is on this list. -->
-  <AppDomains>
-    <AppDomain>AppDomain1</AppDomain>
-    <AppDomain>AppDomain2</AppDomain>
-    <AppDomain>AppDomain3</AppDomain>
-  </AppDomains>
-  <!--End Basic Settings. -->
-
+  <IconUrl DefaultValue="https://hostxrmsac1809.z30.web.core.windows.net/assets/icon-32.png" />
+  <HighResolutionIconUrl DefaultValue="https://hostxrmsac1809.z30.web.core.windows.net/assets/hi-res-icon.png"/>
+  <SupportUrl DefaultValue="https://hostxrmsac1809.z30.web.core.windows.net" />
   <Hosts>
     <Host Name="Mailbox" />
   </Hosts>
@@ -44,13 +33,13 @@
   <FormSettings>
     <Form xsi:type="ItemRead">
       <DesktopSettings>
-        <SourceLocation DefaultValue="https://localhost:3000/index.html"/>
+        <SourceLocation DefaultValue="https://hostxrmsac1809.z30.web.core.windows.net/index.html"/>
         <RequestedHeight>250</RequestedHeight>
       </DesktopSettings>
     </Form>
   </FormSettings>
 
-  <Permissions>ReadWriteItem</Permissions>
+  <Permissions>ReadWriteMailbox</Permissions>
   <Rule xsi:type="RuleCollection" Mode="Or">
     <Rule xsi:type="ItemIs" ItemType="Message" FormType="Read" />
   </Rule>
@@ -98,45 +87,19 @@
           </ExtensionPoint>
           <!-- Go to http://aka.ms/ExtensionPointsCommands to learn how to add more Extension Points: MessageRead, AppointmentOrganizer, AppointmentAttendee -->
         </DesktopFormFactor>
-    <MobileFormFactor>
-    <FunctionFile resid="functionFile" />
-    <ExtensionPoint xsi:type="MobileMessageReadCommandSurface">
-      <Group id="mobileMsgRead">
-        <Label resid="groupLabel" />
-        <Control xsi:type="MobileButton" id="TaskPaneBtn">
-          <Label resid="paneReadButtonLabel" />
-          <Icon xsi:type="bt:MobileIconList">
-            <bt:Image size="25" scale="1" resid="icon16" />
-            <bt:Image size="25" scale="2" resid="icon16" />
-            <bt:Image size="25" scale="3" resid="icon16" />
-
-            <bt:Image size="32" scale="1" resid="icon16" />
-            <bt:Image size="32" scale="2" resid="icon16" />
-            <bt:Image size="32" scale="3" resid="icon16" />
-
-            <bt:Image size="48" scale="1" resid="icon16" />
-            <bt:Image size="48" scale="2" resid="icon16" />
-            <bt:Image size="48" scale="3" resid="icon16" />
-          </Icon>
-          <Action xsi:type="ShowTaskpane">
-            <SourceLocation resid="messageReadTaskPaneUrl" />
-          </Action>
-        </Control>
-      </Group>
-    </ExtensionPoint>
-  </MobileFormFactor>
+    
       </Host>
     </Hosts>
 
     <Resources>
       <bt:Images>
-        <bt:Image id="icon16" DefaultValue="https://localhost:3000/assets/icon-16.png"/>
-        <bt:Image id="icon32" DefaultValue="https://localhost:3000/assets/icon-32.png"/>
-        <bt:Image id="icon80" DefaultValue="https://localhost:3000/assets/icon-80.png"/>
+        <bt:Image id="icon16" DefaultValue="https://hostxrmsac1809.z30.web.core.windows.net/assets/icon-16.png"/>
+        <bt:Image id="icon32" DefaultValue="https://hostxrmsac1809.z30.web.core.windows.net/assets/icon-32.png"/>
+        <bt:Image id="icon80" DefaultValue="https://hostxrmsac1809.z30.web.core.windows.net/assets/icon-80.png"/>
       </bt:Images>
       <bt:Urls>
-        <bt:Url id="functionFile" DefaultValue="https://localhost:3000/function-file/function-file.html"/>
-        <bt:Url id="messageReadTaskPaneUrl" DefaultValue="https://localhost:3000/index.html"/>
+        <bt:Url id="functionFile" DefaultValue="https://hostxrmsac1809.z30.web.core.windows.net/function-file/function-file.html"/>
+        <bt:Url id="messageReadTaskPaneUrl" DefaultValue="https://hostxrmsac1809.z30.web.core.windows.net/index.html"/>
       </bt:Urls>
       <bt:ShortStrings>
         <bt:String id="groupLabel" DefaultValue="My Add-in Group"/>
@@ -148,5 +111,93 @@
         <bt:String id="paneReadSuperTipDescription" DefaultValue="Opens a pane displaying all available properties. This is an example of a button that opens a task pane."/>
       </bt:LongStrings>
     </Resources>
+
+<VersionOverrides xmlns="http://schemas.microsoft.com/office/mailappversionoverrides/1.1" xsi:type="VersionOverridesV1_1">
+<Hosts>
+<Host xsi:type="MailHost">
+  <DesktopFormFactor>
+          <!-- Location of the Functions that UI-less buttons can trigger (ExecuteFunction Actions). -->
+          <FunctionFile resid="functionFile" />
+
+          <!-- Message Read -->
+          <ExtensionPoint xsi:type="MessageReadCommandSurface">
+            <!-- Use the default tab of the ExtensionPoint or create your own with <CustomTab id="myTab"> -->
+            <OfficeTab id="TabDefault">
+              <!-- Up to 6 Groups added per Tab -->
+              <Group id="msgReadGroup">
+                <Label resid="groupLabel" />
+                <!-- Launch the add-in : task pane button -->
+                <Control xsi:type="Button" id="msgReadOpenPaneButton">
+                  <Label resid="paneReadButtonLabel" />
+                  <Supertip>
+                    <Title resid="paneReadSuperTipTitle" />
+                    <Description resid="paneReadSuperTipDescription" />
+                  </Supertip>
+                  <Icon>
+                    <bt:Image size="16" resid="icon16" />
+                    <bt:Image size="32" resid="icon32" />
+                    <bt:Image size="80" resid="icon80" />
+                  </Icon>
+                  <Action xsi:type="ShowTaskpane">
+                    <SourceLocation resid="messageReadTaskPaneUrl" />
+                  </Action>
+                </Control>
+                <!-- Go to http://aka.ms/ButtonCommands to learn how to add more Controls: ExecuteFunction and Menu -->
+              </Group>
+            </OfficeTab>
+          </ExtensionPoint>
+          <!-- Go to http://aka.ms/ExtensionPointsCommands to learn how to add more Extension Points: MessageRead, AppointmentOrganizer, AppointmentAttendee -->
+        </DesktopFormFactor>
+  <MobileFormFactor>
+      <FunctionFile resid="functionFile" />
+      <ExtensionPoint xsi:type="MobileMessageReadCommandSurface">
+        <Group id="mobileMsgRead">
+          <Label resid="groupLabel" />
+          <Control xsi:type="MobileButton" id="TaskPaneBtn">
+            <Label resid="paneReadButtonLabel" />
+            <Icon xsi:type="bt:MobileIconList">
+              <bt:Image size="25" scale="1" resid="icon16" />
+              <bt:Image size="25" scale="2" resid="icon16" />
+              <bt:Image size="25" scale="3" resid="icon16" />
+
+              <bt:Image size="32" scale="1" resid="icon16" />
+              <bt:Image size="32" scale="2" resid="icon16" />
+              <bt:Image size="32" scale="3" resid="icon16" />
+
+              <bt:Image size="48" scale="1" resid="icon16" />
+              <bt:Image size="48" scale="2" resid="icon16" />
+              <bt:Image size="48" scale="3" resid="icon16" />
+            </Icon>
+            <Action xsi:type="ShowTaskpane">
+              <SourceLocation resid="messageReadTaskPaneUrl" />
+            </Action>
+          </Control>
+        </Group>
+      </ExtensionPoint>
+   </MobileFormFactor>
+  </Host>
+  </Hosts>
+
+    <Resources>
+      <bt:Images>
+        <bt:Image id="icon16" DefaultValue="https://hostxrmsac1809.z30.web.core.windows.net/assets/icon-16.png"/>
+        <bt:Image id="icon32" DefaultValue="https://hostxrmsac1809.z30.web.core.windows.net/assets/icon-32.png"/>
+        <bt:Image id="icon80" DefaultValue="https://hostxrmsac1809.z30.web.core.windows.net/assets/icon-80.png"/>
+      </bt:Images>
+      <bt:Urls>
+        <bt:Url id="functionFile" DefaultValue="https://hostxrmsac1809.z30.web.core.windows.net/function-file/function-file.html"/>
+        <bt:Url id="messageReadTaskPaneUrl" DefaultValue="https://hostxrmsac1809.z30.web.core.windows.net/index.html"/>
+      </bt:Urls>
+      <bt:ShortStrings>
+        <bt:String id="groupLabel" DefaultValue="My Add-in Group"/>
+        <bt:String id="customTabLabel"  DefaultValue="My Add-in Tab"/>
+        <bt:String id="paneReadButtonLabel" DefaultValue="Display all properties"/>
+        <bt:String id="paneReadSuperTipTitle" DefaultValue="Get all properties"/>
+      </bt:ShortStrings>
+      <bt:LongStrings>
+        <bt:String id="paneReadSuperTipDescription" DefaultValue="Opens a pane displaying all available properties. This is an example of a button that opens a task pane."/>
+      </bt:LongStrings>
+    </Resources>
+</VersionOverrides>
   </VersionOverrides>
 </OfficeApp>
