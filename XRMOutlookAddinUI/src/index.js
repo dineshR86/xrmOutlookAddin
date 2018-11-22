@@ -33,23 +33,24 @@ var mailitem = {
     listname:""
 }
 
-var hosturl="https://xrmoutlookaddin.azurewebsites.net/api/";
-var securecode="DL8XWGougr5eizgk/6qXzPy7O3sI4j31hpIVOk7a5SujVSYwLx/QZA==";
+var hosturl="https://xrmaddin.azurewebsites.net/api/";
+var securecode="yXSBa1SLBbAvC7p7HIsLZ/R5PwZNwEOapWimJHma8eui5jBtHyL26w==";
 
-// $(document).ready(function () {
-//     fetchConfigData();
-//    loadData();
-//     //getMailData(Office.context.mailbox.item);
-// });
+
+$(document).ready(function () {
+    fetchConfigData();
+   loadData();
+    //getMailData(Office.context.mailbox.item);
+});
 
 //The initialize function must be run each time a new page is loaded
-Office.initialize = (reason) => {
-    //when you browse the page outside outlook load the document.ready outside the this method.
-    $(document).ready(function () {
-       fetchConfigData();
-       loadData();
-    });
-};
+// Office.initialize = (reason) => {
+//     //when you browse the page outside outlook load the document.ready outside the this method.
+//     $(document).ready(function () {
+//        fetchConfigData();
+//        loadData();
+//     });
+// };
 
 
 function getListItems(querydata) {
@@ -219,7 +220,7 @@ function fetchConfigData() {
         },
         error: function (data) { 
             console.log(data);
-            $("#afailure").text(data.statusText+":"+data.responseJSON.summary).css("display","block");
+            $("#afailure").text(data.statusText+":"+data.responseJSON).css("display","block");
             $(".loader").css("display", "none");
          }
     });
