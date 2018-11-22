@@ -37,20 +37,20 @@ var hosturl="https://xrmaddin.azurewebsites.net/api/";
 var securecode="yXSBa1SLBbAvC7p7HIsLZ/R5PwZNwEOapWimJHma8eui5jBtHyL26w==";
 
 
-$(document).ready(function () {
-    fetchConfigData();
-   loadData();
-    //getMailData(Office.context.mailbox.item);
-});
+// $(document).ready(function () {
+//     fetchConfigData();
+//    loadData();
+//     //getMailData(Office.context.mailbox.item);
+// });
 
 //The initialize function must be run each time a new page is loaded
-// Office.initialize = (reason) => {
-//     //when you browse the page outside outlook load the document.ready outside the this method.
-//     $(document).ready(function () {
-//        fetchConfigData();
-//        loadData();
-//     });
-// };
+Office.initialize = (reason) => {
+    //when you browse the page outside outlook load the document.ready outside the this method.
+    $(document).ready(function () {
+       fetchConfigData();
+       loadData();
+    });
+};
 
 
 function getListItems(querydata) {
@@ -156,10 +156,10 @@ function loadData() {
             queryobj.filterfield = "Status";
         } else if (parentselect[0].id == "relatedClient") {
             queryobj.clientfilter = optionselected.val();
-            queryobj.clientfield = "Client_x0020_Contract_x0020_PartLookupId";
+            queryobj.clientfield = "ClientContractPartyLookupId";
         } else if (parentselect[0].id == "relatedStakeholder") {
             queryobj.stakeholderfilter = optionselected.val();
-            queryobj.stakeholderfield = "Stakeholder_x0020_Contract_x0020LookupId";
+            queryobj.stakeholderfield = "StakeholderContractPartyLookupId";
         }
 
         $("#btnFetch").css("display", "block");
