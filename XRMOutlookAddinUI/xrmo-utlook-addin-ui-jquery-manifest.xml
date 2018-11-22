@@ -9,19 +9,19 @@
   <!-- Begin Basic Settings: Add-in metadata, used for all versions of Office unless override provided. -->
 
   <!-- IMPORTANT! Id must be unique for your add-in, if you reuse this manifest ensure that you change this id to a new GUID. -->
-  <Id>dbc2690a-7fd6-4114-b12e-b5e4b38f90a3</Id>
+  <Id>b38dda2a-6fc3-4b29-bc61-9d836d27643b</Id>
 
   <!--Version. Updates from the store only get triggered if there is a version change. -->
   <Version>1.0.0.0</Version>
-  <ProviderName>Cloud Mission</ProviderName>
+  <ProviderName>Cloud Mission 1</ProviderName>
   <DefaultLocale>en-US</DefaultLocale>
   <!-- The display name of your add-in. Used on the store and various places of the Office UI such as the add-ins dialog. -->
   <DisplayName DefaultValue="XRMOUtlookAddin" />
   <Description DefaultValue="Addin for XRMOutlook"/>
   <!-- Icon for your add-in. Used on installation screens and the add-ins dialog. -->
-  <IconUrl DefaultValue="https://hostxrmsac1809.z30.web.core.windows.net/assets/icon-32.png" />
-  <HighResolutionIconUrl DefaultValue="https://hostxrmsac1809.z30.web.core.windows.net/assets/hi-res-icon.png"/>
-  <SupportUrl DefaultValue="https://hostxrmsac1809.z30.web.core.windows.net" />
+  <IconUrl DefaultValue="https://xrmoutlooksp.z16.web.core.windows.net/assets/icon-32.png" />
+  <HighResolutionIconUrl DefaultValue="https://xrmoutlooksp.z16.web.core.windows.net/assets/hi-res-icon.png"/>
+  <SupportUrl DefaultValue="https://xrmoutlooksp.z16.web.core.windows.net" />
   <Hosts>
     <Host Name="Mailbox" />
   </Hosts>
@@ -33,7 +33,7 @@
   <FormSettings>
     <Form xsi:type="ItemRead">
       <DesktopSettings>
-        <SourceLocation DefaultValue="https://hostxrmsac1809.z30.web.core.windows.net/index.html"/>
+        <SourceLocation DefaultValue="https://xrmoutlooksp.z16.web.core.windows.net/index.html"/>
         <RequestedHeight>250</RequestedHeight>
       </DesktopSettings>
     </Form>
@@ -93,13 +93,13 @@
 
     <Resources>
       <bt:Images>
-        <bt:Image id="icon16" DefaultValue="https://hostxrmsac1809.z30.web.core.windows.net/assets/icon-16.png"/>
-        <bt:Image id="icon32" DefaultValue="https://hostxrmsac1809.z30.web.core.windows.net/assets/icon-32.png"/>
-        <bt:Image id="icon80" DefaultValue="https://hostxrmsac1809.z30.web.core.windows.net/assets/icon-80.png"/>
+        <bt:Image id="icon16" DefaultValue="https://xrmoutlooksp.z16.web.core.windows.net/assets/icon-16.png"/>
+        <bt:Image id="icon32" DefaultValue="https://xrmoutlooksp.z16.web.core.windows.net/assets/icon-32.png"/>
+        <bt:Image id="icon80" DefaultValue="https://xrmoutlooksp.z16.web.core.windows.net/assets/icon-80.png"/>
       </bt:Images>
       <bt:Urls>
-        <bt:Url id="functionFile" DefaultValue="https://hostxrmsac1809.z30.web.core.windows.net/function-file/function-file.html"/>
-        <bt:Url id="messageReadTaskPaneUrl" DefaultValue="https://hostxrmsac1809.z30.web.core.windows.net/index.html"/>
+        <bt:Url id="functionFile" DefaultValue="https://xrmoutlooksp.z16.web.core.windows.net/function-file/function-file.html"/>
+        <bt:Url id="messageReadTaskPaneUrl" DefaultValue="https://xrmoutlooksp.z16.web.core.windows.net/index.html"/>
       </bt:Urls>
       <bt:ShortStrings>
         <bt:String id="groupLabel" DefaultValue="My Add-in Group"/>
@@ -180,19 +180,19 @@
 
     <Resources>
       <bt:Images>
-        <bt:Image id="icon16" DefaultValue="https://hostxrmsac1809.z30.web.core.windows.net/assets/icon-16.png"/>
-        <bt:Image id="icon32" DefaultValue="https://hostxrmsac1809.z30.web.core.windows.net/assets/icon-32.png"/>
-        <bt:Image id="icon80" DefaultValue="https://hostxrmsac1809.z30.web.core.windows.net/assets/icon-80.png"/>
+        <bt:Image id="icon16" DefaultValue="https://xrmoutlooksp.z16.web.core.windows.net/assets/icon-16.png"/>
+        <bt:Image id="icon32" DefaultValue="https://xrmoutlooksp.z16.web.core.windows.net/assets/icon-32.png"/>
+        <bt:Image id="icon80" DefaultValue="https://xrmoutlooksp.z16.web.core.windows.net/assets/icon-80.png"/>
       </bt:Images>
       <bt:Urls>
-        <bt:Url id="functionFile" DefaultValue="https://hostxrmsac1809.z30.web.core.windows.net/function-file/function-file.html"/>
-        <bt:Url id="messageReadTaskPaneUrl" DefaultValue="https://hostxrmsac1809.z30.web.core.windows.net/index.html"/>
+        <bt:Url id="functionFile" DefaultValue="https://xrmoutlooksp.z16.web.core.windows.net/function-file/function-file.html"/>
+        <bt:Url id="messageReadTaskPaneUrl" DefaultValue="https://xrmoutlooksp.z16.web.core.windows.net/index.html"/>
       </bt:Urls>
       <bt:ShortStrings>
-        <bt:String id="groupLabel" DefaultValue="My Add-in Group"/>
-        <bt:String id="customTabLabel"  DefaultValue="My Add-in Tab"/>
-        <bt:String id="paneReadButtonLabel" DefaultValue="Display all properties"/>
-        <bt:String id="paneReadSuperTipTitle" DefaultValue="Get all properties"/>
+        <bt:String id="groupLabel" DefaultValue="XRM Group"/>
+        <bt:String id="customTabLabel"  DefaultValue="XRM Tab"/>
+        <bt:String id="paneReadButtonLabel" DefaultValue="Save to Sharepoint"/>
+        <bt:String id="paneReadSuperTipTitle" DefaultValue="Save to Sharepoint"/>
       </bt:ShortStrings>
       <bt:LongStrings>
         <bt:String id="paneReadSuperTipDescription" DefaultValue="Opens a pane displaying all available properties. This is an example of a button that opens a task pane."/>
