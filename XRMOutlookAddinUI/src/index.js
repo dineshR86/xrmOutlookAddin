@@ -174,13 +174,26 @@ function loadData() {
     });
 
     $("#xrmitemsDD").on("change",function(event){
-        $("#btnSave").css("display","block");
-        mailitem.itemid=$(this).find("option:selected").val();
+        if($(this).find("option:selected").text()=="-selected-"){
+            $("#btnSave").css("display","none");    
+        }else{
+            $("#btnSave").css("display","block");
+            mailitem.itemid=$(this).find("option:selected").val();
+        }
     });
 
     $("#btnSave").click(function (event) {
+        console.log("btn save");
+        if($("#xrmitemsDD").find("option:selected").text()=="-selected-"){
+            $("#afailure").text("No Item is selected").css("display","block");
+            return false;
+        }else{
+            $("#afailure").css("display","None");
+        }
+
         if($("#saveemail").is(":checked")||$("#saveattachments").is(":checked")){
-            
+            $("#afailure").css("display","None");
+
             if($("#saveemail").is(":checked")){
                 getMailData(Office.context.mailbox.item);
             }
@@ -190,6 +203,7 @@ function loadData() {
             } 
         }else{
             console.log("Saveemail must be checked");
+            $("#afailure").text("No data to save").css("display","block");
         }
     });
 }
