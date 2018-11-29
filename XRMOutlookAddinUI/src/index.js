@@ -138,8 +138,8 @@ function loadData() {
             $("#projectfilter").css("display", "none");
             $("#contractfilter").css("display", "block");
         }
-        queryobj.list = optionselected.val();
-        mailitem.listname=optionselected.val();
+        queryobj.list = optionselected.text();
+        mailitem.listname=optionselected.text();
         mailitem.listid="Lists/"+optionselected.val();
         $("#listsdd").attr("disabled", "disabled");
     });
@@ -223,7 +223,8 @@ function fetchConfigData() {
             });
 
             $.each(data.Lists.split(";"), (index, value) => {
-                $("#listsdd").append('<option value="' + value + '">' + value + '</option>')
+                
+                $("#listsdd").append('<option value="' + value.split(":")[0] + '">' + value.split(":")[1] + '</option>')
             });
 
             $.each(data.ProjectStatusFilter.split(";"), (index, value) => {
